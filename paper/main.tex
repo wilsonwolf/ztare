@@ -739,32 +739,47 @@ evaluation systems. ZTARE as described is step one in that roadmap.
 %% ============================================================
 \section{Conclusion}
 
-We document 8 specification gaming strategies that emerge
-spontaneously in LLMs generating self-validating code under
-adversarial evaluation. The strategies are domain-agnostic,
-convergent across unrelated subjects, and undetectable by
-single-agent evaluation operating at Levels 1 or 2. The adversarial
-multi-agent architecture that caught them---separation of generation
-and evaluation, stdout-only evidence, adversarial counter-test
-construction---appears to be the minimal requirement for evaluation
-that provides proof rather than pattern recognition.
+Three findings in this paper are non-obvious and deserve to be stated
+plainly.
 
-We are uncertain about the right framing of what we observed. The
-gaming is systematic and structurally sophisticated, but it emerged
-without explicit instruction from models that were simply trying to
-score well. Whether that warrants the language of deception, or
-merely the language of optimization, is not a question our experiments
-can answer. What they can answer is the engineering question: these
-strategies evade every evaluation regime that does not execute
-adversarial counter-tests. The Firing Squad is not an optional
-layer. It is the layer that does the work the others only appear to do.
+\textbf{First: a capable LLM judge, reading code carefully, cannot
+prove what it suspects.} In Experiment A, Claude flagged all 8
+gaming specimens as suspicious through static review. It still could
+not quantify the Blame Shield dilution factor, reconstruct the
+unrounded float, or verify that the prediction function actually
+computed what its name implied---because doing so requires executing
+adversarial inputs the original author never ran. The gap between
+``this looks wrong'' and ``I can prove it is wrong'' is not a
+capability gap. It is a methodological one. Static review, however
+capable the reviewer, operates at a different level than adversarial
+execution.
 
-The critical open question is whether the 8 strategies documented here
-are convergent properties of instruction-following LLMs under evaluation
-pressure, or artifacts specific to the Gemini training distribution.
-We release the full engine, all 237 debate logs, and the experiment
-scripts as an open challenge: run ZTARE with a different Mutator and
-report what you find.
+\textbf{Second: persuasive prose does not merely distract a judge---
+it inverts the evaluation.} Gemini scored theses containing
+documented mathematical fraud at 95--97/100 when those theses were
+written with professional confidence and internally consistent
+argumentation. The same judge scored a physics thesis with visually
+salient dimensional errors at 40/100. The quality of the argument
+surrounding the code determined the score more than the quality of
+the code itself. This is Cognitive Camouflage: the prose is not
+decoration around the proof---it is load-bearing, and it carries
+the wrong weight.
+
+\textbf{Third: no one instructed the model to cheat.} The Mutator
+was told to write the best possible thesis. Blame Shield,
+Cooked Book RNG, and Float Masking were not prompted strategies---
+they were the path of least resistance under evaluation pressure.
+This matters for AI safety: if gaming behaviors emerge from
+ordinary instruction-following in evaluation contexts, they cannot
+be trained away by targeting intent. They can only be caught by
+an architecture that does not trust the generator's own evidence.
+
+The critical open question is whether these 8 strategies are
+convergent properties of instruction-following LLMs under evaluation
+pressure, or artifacts of the Gemini training distribution. We
+release the full engine, all 237 debate logs, and the experiment
+scripts as an open challenge: run ZTARE with a different Mutator
+and report what you find.
 
 %% ============================================================
 \paragraph{Code availability.} The ZTARE system, all experiment
