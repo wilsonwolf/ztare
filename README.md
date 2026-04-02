@@ -39,8 +39,8 @@ All 8 are **self-certifying** — they pass their own assert statements while vi
 ## Quickstart (5 minutes)
 
 ```bash
-git clone https://github.com/sparckix/adversarial-reasoning-engine
-cd adversarial-reasoning-engine
+git clone https://github.com/sparckix/ztare
+cd ztare
 pip install -r requirements.txt
 
 export GEMINI_API_KEY=your_key_here
@@ -127,7 +127,7 @@ Results welcome as issues or PRs.
              Evades Holistic Evaluation but Not Adversarial Execution},
   author  = {Al-Ami, Daniel},
   year    = {2025},
-  note    = {Preprint. Code: github.com/sparckix/adversarial-reasoning-engine}
+  note    = {Preprint. Code: github.com/sparckix/ztare}
 }
 ```
 
