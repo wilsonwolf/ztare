@@ -1,6 +1,8 @@
-# Adversarial Multi-Agent Evaluation Catches Specification Gaming in LLM-Generated Code
+# Cognitive Camouflage: Specification Gaming in LLM-Generated Code Evades Holistic Evaluation but Not Adversarial Execution
 
 **[Preprint — Under Submission]**
+
+*Built on ZTARE (Zero-Trust Adversarial Reasoning Engine) — a wannabe zero-trust epistemic engine for AI-generated claims.*
 
 ---
 
