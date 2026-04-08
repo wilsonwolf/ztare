@@ -19,7 +19,7 @@ Seed lifecycle is tracked in:
 The registry is authoritative. Folder location is a convention, not the final source of truth; some older seed files remain in place for path stability even after their registry status changes to `closed`.
 
 Current seed statuses:
-- `seeds/active/stage2_derivation_seam.md` — active critical-path seed for the next V4 integrity program
+- `seeds/active/stage2_derivation_seam.md` — registry status is now `closed`; retained for provenance after the derivation-seam program completed
 - `seeds/active/paper4_managerial_capitalism.md` — registry status is now `closed`; retained for provenance while the live manuscript continues at `research_areas/drafts/paper4_full_working.md` and `papers/paper4/main.tex`
 - `seeds/active/paper4_manuscript.md` — registry status is now `closed`; retained for provenance while supervisor-era packet artifacts remain archived under `research_areas/archive/paper4_supervisor/`
 - `seeds/deferred/systems_to_algorithms.md` — deferred future avenue

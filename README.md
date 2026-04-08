@@ -37,16 +37,14 @@ The generator cannot influence its own evaluation. The judge never reads prose. 
 
 ## Current Critical Path
 
-The current V4-critical-path seed is:
+There is no active kernel critical-path seed open right now.
+
+The most recent completed critical-path seed/program was:
 
 - `research_areas/seeds/active/stage2_derivation_seam.md`
+- closed via `stage2_derivation_seam_hardening`
 
-This is the next integrity seam to harden after:
-
-- V4 stage hardening
-- bridge hardening
-- runner hardening
-- supervisor control-plane work
+That seam is complete. The next kernel hardening packet has not yet been formally opened.
 
 The supervisor/control-plane entry point is:
 
@@ -315,7 +313,7 @@ paper3/                               # Local scratch/build workspace (gitignore
 paper4/                               # Local scratch/build workspace (gitignored)
 research_areas/                       # Seed specs, seed registry, and grouped debate records
   seed_registry.json                  # Seed lifecycle (active/deferred/closed)
-  seeds/active/stage2_derivation_seam.md                # Current critical-path seed
+  seeds/active/stage2_derivation_seam.md                # Closed derivation-seam seed retained for provenance
   seeds/deferred/systems_to_algorithms.md               # Deferred algorithmic roadmap
   seeds/legacy/v3_interface.md                          # Closed legacy seed
   seeds/deferred/vnext_semantic_gate_stabilization.md   # Deferred kernel hardening seed

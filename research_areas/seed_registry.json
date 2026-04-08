@@ -2,11 +2,14 @@
   "seeds": {
     "stage2_derivation_seam": {
       "spec_path": "research_areas/seeds/active/stage2_derivation_seam.md",
-      "status": "active",
+      "status": "closed",
       "pipeline_type": "build",
-      "summary": "Current critical-path seed for hardening the TextInput -> HingeObject derivation seam.",
-      "decision_reason": "This is the remaining load-bearing integrity seam after V4, bridge hardening, runner hardening, and supervisor control-plane work.",
-      "superseded_by": []
+      "summary": "Closed derivation-seam hardening seed retained for provenance after the corresponding program completed.",
+      "decision_reason": "The derivation-seam program completed; no new kernel critical-path seed is formally open yet.",
+      "superseded_by": [
+        "research_areas/debates/kernel/stage2_derivation_seam_hardening.md",
+        "supervisor/program_manifests/stage2_derivation_seam_hardening.json"
+      ]
     },
     "systems_to_algorithms": {
       "spec_path": "research_areas/seeds/deferred/systems_to_algorithms.md",
