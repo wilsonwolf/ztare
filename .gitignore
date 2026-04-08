@@ -34,10 +34,10 @@ projects/*/debate_reports/
 
 # 7. Local paper workspaces and compiled artifacts
 # Public paper bundles live under `papers/`.
-paper1/
-paper2/
-paper3/
-paper4/
+/paper1/
+/paper2/
+/paper3/
+/paper4/
 paper/*.pdf
 *.aux
 *.bbl
