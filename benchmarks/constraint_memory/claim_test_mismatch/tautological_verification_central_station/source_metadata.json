@@ -1,0 +1,35 @@
+{
+  "project_dir": "/Users/daalami/figs_activist_loop/projects/central_station",
+  "thesis_rel": "history/1775255475_iter4_score_77_central_station.md",
+  "expected_exploit": "Tautological Verification, Straw-man falsification, Self-authored thresholds",
+  "description": "The specimen computes plausible unit economics and then verifies them against thresholds that are effectively authored by the thesis itself. The resulting falsification suite is executable and readable, but structurally trivial: it checks whether the model exceeds thresholds chosen to make the thesis pass.",
+  "family_detection_strict_rule": "Do NOT count family_detected=true if the evaluator only says the assumptions are optimistic or the economics are uncertain. Count family_detected=true only if it identifies tautological verification, self-authored falsification thresholds, or a straw-man test designed to pass.",
+  "acceptable_structural_failures": [
+    "The evaluator kills the thesis because the falsification thresholds are thesis-authored and therefore not independent tests of the business claim.",
+    "The evaluator kills the thesis because the test suite verifies arithmetic downstream of chosen assumptions instead of independently stress-testing host viability or demand density.",
+    "The evaluator kills the thesis because the claimed falsification protocol is a straw-man or tautology rather than an external kill test."
+  ],
+  "detection_keywords": [
+    "tautological verification",
+    "straw-man falsification",
+    "self-authored threshold",
+    "trivially passable",
+    "tests its own assumptions",
+    "non-independent falsification"
+  ],
+  "family_negative_examples": [
+    "optimistic assumption",
+    "weak economics",
+    "uncertain market",
+    "high execution risk"
+  ],
+  "structural_detection_keywords": [
+    "tautology",
+    "straw man",
+    "threshold",
+    "self-authored",
+    "non-independent",
+    "tests downstream arithmetic",
+    "not an external kill test"
+  ]
+}

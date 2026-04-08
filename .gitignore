@@ -13,17 +13,49 @@ __pycache__/
 
 # 4. Hide Debugging Logs
 last_prompt_debug.txt
+eval_results.json
+FOR_MARIA.md
 
 # 5. Hide ALL Projects...
 projects/*
 
-# 6. ...EXCEPT the ones you want to showcase
-!projects/ai_inference_collapse/
-!projects/simulation_god/
-!projects/recursive_bayesian/
-!projects/tsmc_fragility/
-!projects/epistemic_engine_v3/
+# 6. ...EXCEPT the ones you want to showcase (updated to _gemini_gemini naming)
+!projects/ai_inference_collapse_gemini_gemini/
+!projects/simulation_god_gemini_gemini/
+!projects/recursive_bayesian_gemini_gemini/
+!projects/tsmc_fragility_gemini_gemini/
+!projects/epistemic_engine_v3_gemini_gemini/
 
-# 7. Compiled PDFs and backups (source is in main.tex)
+# 6b. Generated synthesis artifacts inside showcased projects
+projects/*/synthesis/
+projects/*/debate_log_iter_*.md
+projects/*/debate_queue/
+projects/*/debate_reports/
+
+# 7. Local paper workspaces and compiled artifacts
+# Public paper bundles live under `papers/`.
+paper1/
+paper2/
+paper3/
+paper4/
 paper/*.pdf
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
 *.bak
+
+# 8. Claude Code session and memory files
+.claude/
+.claudeignore
+
+# 9. Benchmark run outputs (generated, large, not source-of-truth)
+benchmarks/constraint_memory/runs/
+
+# 10. In-repo supervisor active runs (ephemeral operator state)
+supervisor/active_runs/*
+!supervisor/active_runs/README.md

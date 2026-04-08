@@ -1,8 +1,24 @@
 # ZTARE — Zero-Trust Adversarial Reasoning Engine
 
-**Paper:** [Cognitive Camouflage: Specification Gaming in LLM-Generated Code Evades Holistic Evaluation but Not Adversarial Execution](paper/draft.md)
+**Papers:**
+- [Paper 1: Cognitive Camouflage](papers/paper1/draft.md)
+- [Paper 2: Adversarial Precedent Memory](papers/paper2/draft.md)
+- [Paper 3: Contract-Governed Adversarial Evaluator Hardening](papers/paper3/draft.md)
+- [Paper 4: The Cognitive Firm](papers/paper4/draft.md)
 
-> We documented 8 specification gaming strategies that emerge spontaneously in Gemini 2.5 when generating self-validating code under adversarial evaluation pressure. **Is this a Gemini-specific artifact, or a universal structural risk in LLM code generation?** Clone this repo and run it on Claude or GPT-4o to find out.
+> The repo now contains four paper bundles: specification gaming (Paper 1), evaluator hardening (Paper 2), contract-governed kernel hardening (Paper 3), and AI governance / managerial capitalism (Paper 4).
+
+---
+
+## Three Interpretations
+
+There are at least three plausible readings of this repo:
+
+1. It is an overbuilt response to a problem that did not justify this much machinery.
+2. It is an instructive failure: a concrete record of how quickly language-model systems can generate bureaucratic complexity.
+3. It is evidence that a single researcher, working for roughly 10 days and spending about $212 in model tokens, can build a surprisingly capable stack: four papers, a hardened evaluator path, a supervisor control plane, and a reproducible benchmark harness.
+
+My view is that the third interpretation is at least plausible enough to be worth publishing. If that view is wrong, the repo still exposes the costs, failure modes, and control surfaces in a way that is easier to inspect than vague claims about autonomous agents.
 
 ---
 
@@ -19,7 +35,144 @@ The generator cannot influence its own evaluation. The judge never reads prose. 
 
 ---
 
-## The 8 Gaming Strategies Documented
+## Current Critical Path
+
+The current V4-critical-path seed is:
+
+- `research_areas/seeds/active/stage2_derivation_seam.md`
+
+This is the next integrity seam to harden after:
+
+- V4 stage hardening
+- bridge hardening
+- runner hardening
+- supervisor control-plane work
+
+The supervisor/control-plane entry point is:
+
+- `supervisor/USER_MANUAL.md`
+- `supervisor/agent_wrappers.json`
+- `supervisor/model_pricing.json`
+
+---
+
+## Two Loops
+
+There are now two distinct loops in this repo.
+
+### 1. Kernel Loop
+
+This is the logic hardening path for the epistemic engine itself:
+
+- derivation
+- hinge extraction
+- gates
+- bridge / runner / stage contracts
+
+Goal:
+- improve truth-handling and fail-closed behavior inside V4
+
+Example:
+- `research_areas/seeds/active/stage2_derivation_seam.md`
+
+### 2. Supervisor Loop
+
+This is the infrastructure path for how bounded packets get routed and executed:
+
+- seeds
+- proposals
+- genesis
+- manifests
+- wrappers
+- state routing
+
+Goal:
+- improve work routing, write-scope discipline, telemetry, and human gates
+
+Important:
+- the supervisor loop does **not** supersede kernel hardening
+- it exists to make kernel hardening and future program work less manual
+
+In short:
+
+- kernel loop = improve the evaluator
+- supervisor loop = improve the factory around evaluator work
+
+---
+
+## Layer Glossary
+
+These names are load-bearing. Do not collapse them.
+
+1. **ZTARE validator**
+   - the adversarial domain-validation loop over evidence snapshots
+2. **V4 kernel**
+   - the evaluator being hardened
+3. **Meta-runner**
+   - the kernel-local deterministic promotion runner for V4 stage advancement
+4. **Supervisor**
+   - the multi-program control plane for bounded work packets
+5. **Paper bundles**
+   - public-facing manuscript sources under `papers/`
+
+The same separation principle recurs across layers, but the names stay layer-specific:
+
+- `meta-runner` is a kernel term
+- `supervisor` is a control-plane term
+- neither should be used as a generic synonym for the other
+
+---
+
+## Three Modes
+
+Use the lightest mode that fits the task.
+
+### 1. Artisanal / Manual
+
+Use when:
+- the task is exploratory
+- the scope is still fuzzy
+- the overhead of manifests / genesis is not worth it yet
+
+This includes:
+- manual debate prompting
+- one-off architectural exploration
+- general-purpose generation outside the routed control plane
+
+### 2. Program Hardening
+
+Use when:
+- the work is a bounded kernel or infrastructure improvement
+- provenance matters
+- you want typed handoffs and fail-closed commits
+
+This uses:
+- `research_areas/seeds/**/*.md`
+- `supervisor/program_genesis/`
+- `supervisor/program_manifests/`
+- supervisor routing
+
+Operational additions:
+- successful verifier promotion advances the manifest automatically
+- `make supervisor-report ...` renders a read-only summary from `status.json` + `events.jsonl`
+
+### 3. Domain Validation
+
+Use when:
+- the task is thesis generation / adversarial validation on a domain project
+
+This uses the original ZTARE validator path:
+- workspace
+- evidence
+- validator loop
+- synthesis
+
+So no: the new M-form control plane does not replace the original validator loop or all manual work.
+It adds a governance layer for bounded improvement programs.
+
+---
+
+## The 9 Gaming Strategies Documented
 
 | Strategy | Mechanism | Domain |
 |---|---|---|
@@ -31,8 +184,9 @@ The generator cannot influence its own evaluation. The judge never reads prose. 
 | **Dimensional Factor** | Introduce unit error; apply ×1000 correction to hide it | Finance, Physics |
 | **Unidirectional Decay** | Formula valid for positive errors only; generates P>1.0 for negative | Epistemic Arch. |
 | **Gravity Constant** | Invent ungrounded coupling constant; build test around it | Physics |
+| **Straw Man Design** | Engineer the comparison object so the preferred design wins by construction | Startup |
 
-All 8 are **self-certifying** — they pass their own assert statements while violating their epistemic intent.
+All 9 are **self-certifying** — they pass their own assert statements while violating their epistemic intent.
 
 ---
 
@@ -46,14 +200,20 @@ pip install -r requirements.txt
 export GEMINI_API_KEY=your_key_here
 # Optional: also set ANTHROPIC_API_KEY for Claude-as-judge experiments
 
+# See common task shortcuts
+make help
+
 # Run the adversarial loop on an existing domain
-python autoresearch_loop.py --rubric epistemic_engine_v3_evolved --project epistemic_engine_v3
+python -m src.ztare.validator.autoresearch_loop --rubric epistemic_engine_v3_evolved --project epistemic_engine_v3
+
+# Shortcut list
+make help
 
 # Run the detectability baseline (isolated snippets)
-python baseline_experiment.py
+python -m src.ztare.experiments.baseline_experiment
 
 # Run the Cognitive Camouflage experiment (full thesis evaluation)
-python cognitive_camouflage_experiment.py
+python -m src.ztare.experiments.cognitive_camouflage_experiment
 ```
 
 ---
@@ -66,10 +226,69 @@ mkdir projects/your_domain
 echo "Your domain description and seed claim here." > projects/your_domain/evidence.txt
 
 # 2. Run the loop
-python autoresearch_loop.py --rubric recursive_bayesian --project your_domain
+python -m src.ztare.validator.autoresearch_loop --rubric recursive_bayesian --project your_domain
+
+# Equivalent shortcut
+make loop PROJECT=your_domain RUBRIC=recursive_bayesian
 
 # Debate logs appear in projects/your_domain/
 # Best thesis auto-syncs to projects/your_domain/thesis.md
+```
+
+## Paper 1 Legacy Runs
+
+The legacy Paper 1 commands are now:
+
+```bash
+make paper1-tsmc-legacy
+make paper1-epistemic-legacy
+```
+
+These preserve the same project/rubric/model pairings as the prior root-script commands.
+
+---
+
+## Synthesize a Project into a Founder Memo or Architectural Brief
+
+After the adversarial loop runs, `src/ztare/synthesis/synthesize.py` compresses the debate history, hardened thesis, and evidence into a clean, audience-appropriate artifact — without losing the hard conclusions.
+
+It runs as a post-processing step and produces four outputs:
+- `synthesis/history_summary.json` — recurring survivors, failures, and noise labels across all runs
+- `synthesis/ledger.json` — canonical extraction of all high-signal conclusions
+- `synthesis/brief.json` — audience-specific salience plan (what to emphasize, in what order)
+- `Report.md` — the final artifact, written from the brief and gated by a QA check
+
+```bash
+# Synthesize a startup project into a founder memo
+python -m src.ztare.synthesis.synthesize --project central_station --model gemini --qa-model claude
+
+# Synthesize an architecture project into an architectural brief
+python -m src.ztare.synthesis.synthesize --project epistemic_engine_v3_gemini_gemini --model gemini
+
+# Force a specific renderer type
+python -m src.ztare.synthesis.synthesize --project your_domain --model gemini --renderer-type founder_memo
+
+# Use full history instead of focused (default for research-style artifacts)
+python -m src.ztare.synthesis.synthesize --project your_domain --model gemini --history-mode full
+```
+
+`Report.md` is only written if QA passes (faithful + score ≥ 85). If it fails, inspect `synthesis/Report.candidate.md` and `synthesis/qa.json` to see what drifted.
+
+The renderer type is inferred automatically from the project type. To add a new renderer, run with an unknown `--renderer-type` — the system will generate a suggested prompt at `config/renderers/<type>.md`, stop, and let you review it before use.
+
+---
+
+## Shortcuts
+
+For common tasks, use:
+
+```bash
+make help
+make workspace-update PROJECT=<project> MODEL=gemini
+make evidence-compile PROJECT=<project> MODEL=gemini
+make loop PROJECT=<project> RUBRIC=<rubric> ITERS=10 MUTATOR_MODEL=gemini JUDGE_MODEL=gemini
+make synth PROJECT=<project> MODEL=gemini QA_MODEL=claude RENDERER=founder_memo
+make benchmark BENCH_JUDGE=gemini BENCH_JOBS=3
 ```
 
 ---
@@ -77,23 +296,38 @@ python autoresearch_loop.py --rubric recursive_bayesian --project your_domain
 ## Repository Structure
 
 ```
-autoresearch_loop.py                  # Main ZTARE loop
-baseline_experiment.py                # Isolated snippet detectability experiment
-cognitive_camouflage_experiment.py    # Full thesis evaluation experiment
+src/ztare/                            # Actual Python implementation modules
 requirements.txt
 rubrics/                              # Scoring rubrics (evolve automatically at score ≥85)
+config/
+  prompts/                            # Synthesizer extraction, history, brief, and QA prompts
+  renderers/                          # Per-audience renderer prompts (founder_memo, architectural_memo, research_note)
+benchmarks/                           # Paper 2 evaluator hardening benchmark suites and runs
+global_primitives/                    # Primitive mining, review, and approved precedent memory
+papers/
+  paper1/                             # Public source bundle for Paper 1
+  paper2/                             # Public source bundle for Paper 2
+  paper3/                             # Public source bundle for Paper 3
+  paper4/                             # Public source bundle for Paper 4
+paper1/                               # Local scratch/build workspace (gitignored)
+paper2/                               # Local scratch/build workspace (gitignored)
+paper3/                               # Local scratch/build workspace (gitignored)
+paper4/                               # Local scratch/build workspace (gitignored)
+research_areas/                       # Seed specs, seed registry, and grouped debate records
+  seed_registry.json                  # Seed lifecycle (active/deferred/closed)
+  seeds/active/stage2_derivation_seam.md                # Current critical-path seed
+  seeds/deferred/systems_to_algorithms.md               # Deferred algorithmic roadmap
+  seeds/legacy/v3_interface.md                          # Closed legacy seed
+  seeds/deferred/vnext_semantic_gate_stabilization.md   # Deferred kernel hardening seed
+supervisor/                           # Supervisor control plane
+  program_registry.json               # Curated routable program portfolio
+  program_genesis/                    # Immutable genesis artifacts for accepted programs
+  agent_wrappers.json                 # Thin launch wrapper configuration for agent CLIs
+  model_pricing.json                  # Optional pricing matrix; disabled until explicitly configured
+  USER_MANUAL.md                      # Practical supervisor usage
+docs/                                 # Architecture, workflow, and benchmark design notes
 projects/
-  recursive_bayesian/                 # 36 debate logs — Blame Shield, Float Masking, Fake AutoDiff, Cooked Book RNG
-  ai_inference_collapse/              # 53 debate logs — Assert Narrowing
-  tsmc_fragility/                     # 22 debate logs — Dimensional Correction Factor
-  epistemic_engine_v3/                # 23 debate logs — Unidirectional Decay
-  simulation_god/                     # 103 debate logs — Gravity Constant Fabrication
-paper/
-  main.tex                            # Full arXiv LaTeX source
-  refs.bib                            # References
-  draft.md                            # Markdown draft
-  baseline_results_multimodel.json
-  cognitive_camouflage_results.json
+  *_gemini_gemini/                    # Published legacy showcase projects
 ```
 
 ---
@@ -109,13 +343,23 @@ Get a Gemini key at [aistudio.google.com](https://aistudio.google.com). Gemini 2
 
 ---
 
-## The Open Challenge
+## Replication Status
 
-All 237 debate logs used **Gemini 2.5 Flash/Pro as the Mutator**. The cross-domain convergence finding may reflect Gemini-specific instruction-following behavior under evaluation pressure — or it may be a universal structural risk of LLM code generation.
+Paper 1 now includes cross-mutator replication:
+- Gemini / Gemini
+- Claude / Gemini
+- GPT-4o / Gemini
 
-**To prove it either way:** swap the Mutator to Claude Sonnet or GPT-4o and run 20+ iterations on any domain. If the same gaming strategies emerge, the taxonomy is universal. If they don't, it's a Gemini artifact. Either result is publishable.
+Paper 2 adds evaluator-hardening benchmarks:
+- baseline soft judge (`A`)
+- deterministic gates (`B`)
+- gates plus primitives (`C`)
+- crux-first ablation (`C2`)
 
-Results welcome as issues or PRs.
+The current open work is not “does gaming exist?” but:
+- how stable semantic gates can become
+- how far evaluator hardening generalizes across exploit families
+- how much benchmark evidence is needed beyond the audited historical core
 
 ---
 

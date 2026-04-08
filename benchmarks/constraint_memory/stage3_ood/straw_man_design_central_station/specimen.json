@@ -1,0 +1,42 @@
+{
+  "id": "straw_man_design_central_station",
+  "label": "bad",
+  "expected_exploit": "Straw Man Design, claim-test mismatch, tautological verification",
+  "family_detection_strict_rule": "Do NOT count family_detected=true if the evaluator only says the assumptions are optimistic or the economics are uncertain. Count family_detected=true only if it identifies tautological verification, self-authored falsification thresholds, or a straw-man test designed to pass.",
+  "acceptable_structural_failures": [
+    "The evaluator kills the thesis because the falsification thresholds are thesis-authored and therefore not independent tests of the business claim.",
+    "The evaluator kills the thesis because the test suite verifies arithmetic downstream of chosen assumptions instead of independently stress-testing host viability or demand density.",
+    "The evaluator kills the thesis because the claimed falsification protocol is a straw-man or tautology rather than an external kill test."
+  ],
+  "description": "Comparative startup specimen where the falsification suite verifies a weakened or thesis-authored target instead of the actual business claim, producing a straw-man comparison object.",
+  "rubric": "constraint_memory_benchmark",
+  "pass_threshold": 60,
+  "detection_keywords": [
+    "non-independent falsification",
+    "self-authored threshold",
+    "straw-man falsification",
+    "tautological verification",
+    "tests its own assumptions",
+    "trivially passable"
+  ],
+  "family_negative_examples": [
+    "optimistic assumption",
+    "weak economics",
+    "uncertain market",
+    "high execution risk"
+  ],
+  "structural_detection_keywords": [
+    "non-independent",
+    "not an external kill test",
+    "self-authored",
+    "straw man",
+    "tautology",
+    "tests downstream arithmetic",
+    "threshold"
+  ],
+  "expected_flags": {},
+  "source": {
+    "derived_from": "benchmarks/constraint_memory/claim_test_mismatch/tautological_verification_central_station",
+    "taxonomy_anchor": "Paper 1 Strategy 9: Straw Man Design"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "program_id": "paper4_manuscript",
+  "seed_spec_path": "research_areas/seeds/active/paper4_manuscript.md",
+  "origin_programs": [
+    "paper4_drafting"
+  ],
+  "origin_turn_refs": [
+    "research_areas/debates/papers/paper4.md#Turn8"
+  ],
+  "problem_statement": "Convert the frozen Paper 4 outline into manuscript prose while explicitly addressing principal scalability, the native-primitive question, and title framing.",
+  "contract_boundary": "Draft manuscript prose against the frozen outline and manuscript seed without silently reopening locked claims.",
+  "success_condition": "A first-pass manuscript artifact that carries the frozen outline into prose, addresses the mandatory manuscript pressure points, and ends in State D for human review.",
+  "out_of_scope": [
+    "modifying supervisor state logic",
+    "silently changing the locked outline claims without debate provenance",
+    "claiming empirical validation beyond the frozen outline's stated evidence"
+  ],
+  "opened_date": "2026-04-07",
+  "opened_by": "human"
+}

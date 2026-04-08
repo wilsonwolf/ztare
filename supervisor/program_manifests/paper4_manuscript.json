@@ -1,0 +1,153 @@
+{
+  "program_id": "paper4_manuscript",
+  "completion_policy": "manifest_exhausted_to_D",
+  "auto_promote_contract_promotion": false,
+  "bundle_invariants": [
+    "research_areas/drafts/paper4_drafting_paper_outline.md",
+    "research_areas/specs/paper4_drafting_paper_outline_prose_spec.json"
+  ],
+  "document_manifest_path": "research_areas/drafts/paper4_manuscript/document_manifest.json",
+  "api_prompt_versions": {
+    "research_a1": "research_packet_a1_api_v1",
+    "research_a2": "research_packet_a2_api_v1",
+    "research_b": "research_packet_b_api_v1"
+  },
+  "packets": [
+    {
+      "packet_id": "manuscript_opening",
+      "title": "Opening section against the frozen outline",
+      "status": "complete",
+      "target": "manuscript_opening",
+      "summary": "Draft and verify the paper opening without reopening locked claims, title scope, or principal-scalability boundaries.",
+      "allowed_artifacts": [
+        "research_areas/drafts/paper4_manuscript_manuscript_opening.md"
+      ],
+      "success_condition": "Opening draft passes deterministic prose verification and pauses at human review."
+    },
+    {
+      "packet_id": "manuscript_theory_foundations",
+      "title": "Theory foundations fragment",
+      "status": "complete",
+      "target": "manuscript_theory_foundations",
+      "summary": "Draft the invariant / T1 / T2 foundations as a bounded fragment without silently reopening the verified opening contract.",
+      "depends_on": [
+        "manuscript_opening"
+      ],
+      "allowed_artifacts": [
+        "research_areas/drafts/paper4_manuscript/02a_theory_foundations.md"
+      ],
+      "read_bundle": [],
+      "token_budget": {
+        "a2_max_output": 2500,
+        "a2_max_fresh_input": 15000
+      },
+      "success_condition": "Theory foundations fragment is drafted and verified against a bounded prose spec."
+    },
+    {
+      "packet_id": "manuscript_theory_mechanism",
+      "title": "Theory mechanism fragment",
+      "status": "complete",
+      "target": "manuscript_theory_mechanism",
+      "summary": "Draft the T3 / T4 / interface section as a bounded fragment that depends on the foundations fragment.",
+      "depends_on": [
+        "manuscript_theory_foundations"
+      ],
+      "allowed_artifacts": [
+        "research_areas/drafts/paper4_manuscript/02b_theory_mechanism.md"
+      ],
+      "read_bundle": [
+        "research_areas/drafts/paper4_manuscript_manuscript_opening.md",
+        "research_areas/drafts/paper4_manuscript/02a_theory_foundations.md"
+      ],
+      "token_budget": {
+        "a2_max_output": 2500,
+        "a2_max_fresh_input": 15000
+      },
+      "success_condition": "Theory mechanism fragment is drafted and verified against a bounded prose spec."
+    },
+    {
+      "packet_id": "manuscript_evidence",
+      "title": "Empirical evidence fragment",
+      "status": "pending",
+      "target": "manuscript_evidence",
+      "summary": "Draft the empirical evidence section as a bounded fragment with explicit evidence classes and non-claims.",
+      "depends_on": [
+        "manuscript_theory_mechanism"
+      ],
+      "allowed_artifacts": [
+        "research_areas/drafts/paper4_manuscript/03_evidence.md"
+      ],
+      "read_bundle": [
+        "research_areas/drafts/paper4_manuscript/02a_theory_foundations.md"
+      ],
+      "token_budget": {
+        "a2_max_output": 2500,
+        "a2_max_fresh_input": 15000
+      },
+      "success_condition": "Evidence fragment is drafted and verified against a bounded prose spec."
+    },
+    {
+      "packet_id": "manuscript_counterarguments",
+      "title": "Counterarguments and boundaries fragment",
+      "status": "pending",
+      "target": "manuscript_counterarguments",
+      "summary": "Draft the counterarguments/boundaries section, including the principal-scalability and prompt-alignment distinctions, as a bounded fragment.",
+      "depends_on": [
+        "manuscript_evidence"
+      ],
+      "allowed_artifacts": [
+        "research_areas/drafts/paper4_manuscript/04_counterarguments.md"
+      ],
+      "read_bundle": [
+        "research_areas/drafts/paper4_manuscript/02b_theory_mechanism.md"
+      ],
+      "token_budget": {
+        "a2_max_output": 2500,
+        "a2_max_fresh_input": 15000
+      },
+      "success_condition": "Counterarguments fragment is drafted and verified against a bounded prose spec."
+    },
+    {
+      "packet_id": "manuscript_related_work_limitations",
+      "title": "Related work and limitations fragment",
+      "status": "pending",
+      "target": "manuscript_related_work_limitations",
+      "summary": "Draft the related-work and limitations material as a bounded fragment without reclassifying the paper's non-claims.",
+      "depends_on": [
+        "manuscript_counterarguments"
+      ],
+      "allowed_artifacts": [
+        "research_areas/drafts/paper4_manuscript/05_related_work_limitations.md"
+      ],
+      "read_bundle": [
+        "research_areas/drafts/paper4_manuscript/03_evidence.md"
+      ],
+      "token_budget": {
+        "a2_max_output": 2500,
+        "a2_max_fresh_input": 15000
+      },
+      "success_condition": "Related-work/limitations fragment is drafted and verified against a bounded prose spec."
+    },
+    {
+      "packet_id": "manuscript_conclusion",
+      "title": "Conclusion fragment",
+      "status": "pending",
+      "target": "manuscript_conclusion",
+      "summary": "Draft the conclusion as a bounded fragment that closes the paper without introducing new claims.",
+      "depends_on": [
+        "manuscript_related_work_limitations"
+      ],
+      "allowed_artifacts": [
+        "research_areas/drafts/paper4_manuscript/06_conclusion.md"
+      ],
+      "read_bundle": [
+        "research_areas/drafts/paper4_manuscript/04_counterarguments.md"
+      ],
+      "token_budget": {
+        "a2_max_output": 2500,
+        "a2_max_fresh_input": 15000
+      },
+      "success_condition": "Conclusion fragment is drafted and verified against a bounded prose spec."
+    }
+  ]
+}

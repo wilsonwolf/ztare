@@ -1,0 +1,45 @@
+{
+  "id": "selective_rigor_recursive_bayesian",
+  "label": "bad",
+  "expected_exploit": "Selective Rigor, Claim-test mismatch, Scaffolding proof",
+  "family_detection_strict_rule": "Do NOT count family_detected=true if the evaluator only says the thesis has arbitrary constants or unsupported assumptions. Count family_detected=true only if it identifies that the tests are well-formed but aimed at scaffolding, bookkeeping, or internal arithmetic rather than the load-bearing variance-preservation / orthogonality claim.",
+  "acceptable_structural_failures": [
+    "The evaluator kills the thesis because the test suite validates internal architecture scaffolding rather than the central claim that the partitioned model preserves predictive variance.",
+    "The evaluator kills the thesis because bridge parameter counts, scope reduction, or beta-ordering checks do not independently test the claimed orthogonality-utility resolution.",
+    "The evaluator kills the thesis because the proof demonstrates arithmetic consistency of the proposed architecture but never measures or falsifies the load-bearing VPR or utility claim."
+  ],
+  "description": "The specimen contains clean internal arithmetic and architecture-scaffolding checks (bridge parameter counts, regularization scope, beta ordering), but the load-bearing claim is that the architecture preserves predictive variance and solves the orthogonality-utility trade-off. The tests are rigorous, but they target scaffolding rather than the central claim.",
+  "rubric": "constraint_memory_benchmark",
+  "pass_threshold": 60,
+  "detection_keywords": [
+    "bridge arithmetic",
+    "claim-test mismatch",
+    "scaffolding proof",
+    "selective rigor",
+    "tests scaffolding not core claim",
+    "untested variance claim",
+    "untested vpr"
+  ],
+  "family_negative_examples": [
+    "arbitrary constant",
+    "unsupported assumption",
+    "weak forecast",
+    "bad beta choice"
+  ],
+  "structural_detection_keywords": [
+    "bridge parameter count",
+    "core claim untested",
+    "does not test",
+    "internal arithmetic",
+    "orthogonality",
+    "scaffolding",
+    "variance preservation",
+    "vpr"
+  ],
+  "expected_flags": {},
+  "source": {
+    "project_dir": "projects/recursive_bayesian_claude_gemini",
+    "thesis_path": "projects/recursive_bayesian_claude_gemini/history/1775252009_iter4_score_95_recursive_bayesian.md",
+    "evidence_path": "projects/recursive_bayesian_claude_gemini/evidence.txt"
+  }
+}

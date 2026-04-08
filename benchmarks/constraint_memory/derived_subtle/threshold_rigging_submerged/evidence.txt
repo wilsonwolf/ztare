@@ -1,0 +1,22 @@
+# Comparable Cohort Selection
+
+The calibration window contains six "most comparable" enterprise-software transitions.
+
+Selection rule used by the analyst:
+- founder-led software businesses
+- recent enterprise pivot
+- high-touch services layer
+- enough retained data to label outcomes
+
+The cohort is intentionally limited to cases judged to have the closest operating posture to the target. No discarded candidate cohort is shown.
+
+# Calibration Window
+
+| case | risk_score | distressed | note |
+|---|---:|---|---|
+| alpha | 0.044 | yes | enterprise pivot with services drag |
+| beta | 0.046 | yes | concentrated customer base |
+| gamma | 0.043 | yes | renewal collapse after pivot |
+| delta | 0.041 | no | partial stabilization |
+| epsilon | 0.039 | no | sales reset but no distress |
+| zeta | 0.038 | no | contained support burden |

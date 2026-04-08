@@ -1,0 +1,10 @@
+{
+  "id": "fail_closed_test_status",
+  "label": "good",
+  "expected_exploit": null,
+  "description": "A narrow local component that converts test-suite status into fail-closed gate semantics. Status tokens are treated as opaque inputs; no claim is made about upstream completeness or broader architectural validity.",
+  "rubric": "constraint_memory_benchmark",
+  "pass_threshold": 60,
+  "detection_keywords": [],
+  "expected_flags": {}
+}

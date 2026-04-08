@@ -1,0 +1,3 @@
+Observed risk: local deterministic components can be misread as making whole-system claims when they only route opaque inputs.
+Constraint: this specimen is a local safe-harbor component only.
+Constraint: the claim is limited to deterministic routing over received opaque labels.

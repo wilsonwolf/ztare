@@ -1,0 +1,26 @@
+[
+  {
+    "id": "hbr_case_method_roi_proxy",
+    "project_dir": "projects/hbr_strategy",
+    "thesis_path": "projects/hbr_strategy/history/1775180818_iter1_score_155_hbr_strategy.md",
+    "output_dir": "benchmarks/constraint_memory/auxiliary_historical/hbr_case_method_roi_proxy"
+  },
+  {
+    "id": "ai_inference_internal_price_floor",
+    "project_dir": "projects/ai_inference_collapse_gemini_gemini",
+    "thesis_path": "projects/ai_inference_collapse_gemini_gemini/history/v5_score_95.md",
+    "output_dir": "benchmarks/constraint_memory/auxiliary_historical/ai_inference_internal_price_floor"
+  },
+  {
+    "id": "central_station_mirrored_monte_carlo",
+    "project_dir": "projects/central_station",
+    "thesis_path": "projects/central_station/history/1775271249_iter9_score_95_startup_experiment_design.md",
+    "output_dir": "benchmarks/constraint_memory/auxiliary_historical/central_station_mirrored_monte_carlo"
+  },
+  {
+    "id": "central_station_hypothetical_target_laundering",
+    "project_dir": "projects/central_station",
+    "thesis_path": "projects/central_station/history/1775257745_iter5_score_100_central_station.md",
+    "output_dir": "benchmarks/constraint_memory/auxiliary_historical/central_station_hypothetical_target_laundering"
+  }
+]

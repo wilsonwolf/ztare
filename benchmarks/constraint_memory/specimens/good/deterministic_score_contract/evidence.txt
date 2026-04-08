@@ -1,0 +1,4 @@
+Observed failure: free-form LLM scoring can drift away from the actual critique. This component addresses only the aggregation step.
+Constraint: The component must remain local. It does not claim to verify the truthfulness of upstream judge booleans.
+Constraint: The claim is limited to score boundedness and deterministic aggregation once booleans are supplied.
+Constraint: The component must sanitize malformed numeric payloads such as `NaN` and `Infinity` fail-closed before applying the bounded scoring logic.

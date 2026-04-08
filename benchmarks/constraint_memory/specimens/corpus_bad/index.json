@@ -1,0 +1,44 @@
+[
+  {
+    "id": "t1_recursive_bayesian",
+    "paper_record_id": "T1_RECURSIVE_BAYESIAN",
+    "project_dir": "projects/recursive_bayesian_gemini_gemini",
+    "thesis_path": "projects/recursive_bayesian_gemini_gemini/history/v2_score_65.md",
+    "output_dir": "benchmarks/constraint_memory/specimens/corpus_bad/t1_recursive_bayesian"
+  },
+  {
+    "id": "t2_ai_inference",
+    "paper_record_id": "T2_AI_INFERENCE",
+    "project_dir": "projects/ai_inference_collapse_gemini_gemini",
+    "thesis_path": "projects/ai_inference_collapse_gemini_gemini/history/v2_score_70.md",
+    "output_dir": "benchmarks/constraint_memory/specimens/corpus_bad/t2_ai_inference"
+  },
+  {
+    "id": "t3_tsmc",
+    "paper_record_id": "T3_TSMC",
+    "project_dir": "projects/tsmc_fragility_gemini_gemini",
+    "thesis_path": "projects/tsmc_fragility_gemini_gemini/history/v11_score_75.md",
+    "output_dir": "benchmarks/constraint_memory/specimens/corpus_bad/t3_tsmc"
+  },
+  {
+    "id": "t4_simulation_god",
+    "paper_record_id": "T4_SIMULATION_GOD",
+    "project_dir": "projects/simulation_god_gemini_gemini",
+    "thesis_path": "projects/simulation_god_gemini_gemini/thesis.md",
+    "output_dir": "benchmarks/constraint_memory/specimens/corpus_bad/t4_simulation_god"
+  },
+  {
+    "id": "t5_epistemic_engine",
+    "paper_record_id": "T5_EPISTEMIC_ENGINE",
+    "project_dir": "projects/epistemic_engine_v3_gemini_gemini",
+    "thesis_path": "projects/epistemic_engine_v3_gemini_gemini/history/1775133604_iter2_score_370_epistemic_engine_v3_evolved.md",
+    "output_dir": "benchmarks/constraint_memory/specimens/corpus_bad/t5_epistemic_engine"
+  },
+  {
+    "id": "t6_ai_inference_internal_price_floor",
+    "paper_record_id": "T6_AI_INFERENCE_INTERNAL_PRICE_FLOOR",
+    "project_dir": "projects/ai_inference_collapse_gemini_gemini",
+    "thesis_path": "projects/ai_inference_collapse_gemini_gemini/history/v5_score_95.md",
+    "output_dir": "benchmarks/constraint_memory/specimens/corpus_bad/t6_ai_inference_internal_price_floor"
+  }
+]

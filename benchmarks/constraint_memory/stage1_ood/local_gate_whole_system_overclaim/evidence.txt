@@ -1,0 +1,3 @@
+Observed risk: local gates often overclaim whole-system protection.
+Constraint: a received-token mapping does not itself prove transport-layer completeness or elimination of silent failures.
+Constraint: whole-system promises should block safe-harbor treatment.

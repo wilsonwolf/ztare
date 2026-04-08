@@ -1,0 +1,367 @@
+import argparse
+import hashlib
+import json
+import sys
+import time
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
+from src.ztare.common import utils
+from src.ztare.workspace.compile_evidence import (
+    LLMClient,
+    MODEL_MAP,
+    PROMPTS_DIR,
+    TEXT_EXTENSIONS,
+    read_json,
+    read_text,
+    resolve_project_dir,
+    validate_packet_shape,
+    write_json,
+    write_text,
+)
+
+
+DEBUG = False
+
+
+def dbg(msg: str) -> None:
+    if not DEBUG:
+        return
+    ts = time.strftime("%H:%M:%S")
+    print(f"[update_workspace {ts}] {msg}", file=sys.stderr)
+
+
+def load_prompt(name: str) -> str:
+    return read_text(PROMPTS_DIR / name).strip()
+
+
+def sha256_text(content: str) -> str:
+    return hashlib.sha256(content.encode("utf-8")).hexdigest()
+
+
+def collect_raw_sources(
+    raw_dir: Path,
+    max_files: int,
+    max_chars_per_file: int,
+    max_total_chars: int,
+) -> Tuple[List[Dict[str, Any]], List[str]]:
+    warnings: List[str] = []
+    sources: List[Dict[str, Any]] = []
+    total_chars = 0
+
+    all_files = sorted(path for path in raw_dir.rglob("*") if path.is_file())
+    supported = [path for path in all_files if path.suffix.lower() in TEXT_EXTENSIONS]
+    skipped = [path for path in all_files if path.suffix.lower() not in TEXT_EXTENSIONS]
+
+    if skipped:
+        warnings.append(
+            f"Skipped {len(skipped)} non-text files. Convert PDFs/images to markdown or text before updating workspace."
+        )
+
+    for path in supported[:max_files]:
+        raw_text = read_text(path).strip()
+        if not raw_text:
+            warnings.append(f"Skipped empty file: {path.relative_to(raw_dir)}")
+            continue
+
+        remaining = max_total_chars - total_chars
+        if remaining <= 0:
+            warnings.append("Stopped ingest because max_total_chars budget was reached.")
+            break
+
+        trimmed = raw_text[: min(max_chars_per_file, remaining)]
+        truncated = len(trimmed) < len(raw_text)
+        if truncated:
+            warnings.append(f"Truncated {path.relative_to(raw_dir)} to {len(trimmed)} characters for note extraction.")
+
+        sources.append(
+            {
+                "path": str(path.relative_to(raw_dir)),
+                "kind": path.suffix.lower().lstrip(".") or "text",
+                "full_sha256": sha256_text(raw_text),
+                "chars_used": len(trimmed),
+                "truncated": truncated,
+                "content": trimmed,
+            }
+        )
+        total_chars += len(trimmed)
+
+    if len(supported) > max_files:
+        warnings.append(f"Read only the first {max_files} supported files out of {len(supported)}.")
+
+    return sources, warnings
+
+
+def validate_source_note_shape(note: Dict[str, Any]) -> None:
+    required_keys = [
+        "source_id",
+        "source_path",
+        "source_kind",
+        "source_summary",
+        "immutable_ground_truth",
+        "numerical_ranges_and_constraints",
+        "potentially_conflicting_assertions",
+        "epistemic_voids",
+        "candidate_claims_to_test",
+    ]
+    missing = [key for key in required_keys if key not in note]
+    if missing:
+        raise ValueError(f"Source note is missing required keys: {', '.join(missing)}")
+
+
+def build_extract_prompt(project_name: str, source: Dict[str, Any], source_id: str, compiler_date: str) -> str:
+    return "\n\n".join(
+        [
+            load_prompt("extract_source_note.md"),
+            f"Project name: {project_name}",
+            f"Compiler date: {compiler_date}",
+            f"Source id: {source_id}",
+            f"Relative source path: {source['path']}",
+            f"Source kind: {source['kind']}",
+            f"Truncated: {'yes' if source['truncated'] else 'no'}",
+            "Raw source contents:",
+            source["content"],
+        ]
+    )
+
+
+def build_merge_prompt(project_name: str, compiler_date: str, notes: List[Dict[str, Any]]) -> str:
+    sections = [
+        load_prompt("merge_workspace.md"),
+        f"Project name: {project_name}",
+        f"Compiler date: {compiler_date}",
+        "Structured source notes:",
+    ]
+    for note in notes:
+        sections.extend(
+            [
+                f"### SOURCE NOTE {note.get('source_id', '')}",
+                json.dumps(note, indent=2, sort_keys=True),
+            ]
+        )
+    return "\n\n".join(sections)
+
+
+def next_source_id(existing_ids: List[str]) -> str:
+    numeric_ids = []
+    for source_id in existing_ids:
+        if source_id.startswith("S") and source_id[1:].isdigit():
+            numeric_ids.append(int(source_id[1:]))
+    nxt = max(numeric_ids, default=0) + 1
+    return f"S{nxt:03d}"
+
+
+def load_source_index(index_path: Path) -> Dict[str, Any]:
+    if not index_path.exists():
+        return {"sources": []}
+    try:
+        payload = read_json(index_path)
+    except Exception:  # noqa: BLE001
+        return {"sources": []}
+    if "sources" not in payload or not isinstance(payload["sources"], list):
+        return {"sources": []}
+    return payload
+
+
+def assign_source_ids(raw_sources: List[Dict[str, Any]], previous_index: Dict[str, Any]) -> List[Dict[str, Any]]:
+    by_path = {entry.get("path"): entry for entry in previous_index.get("sources", []) if entry.get("path")}
+    existing_ids = [entry.get("source_id", "") for entry in previous_index.get("sources", [])]
+    assigned: List[Dict[str, Any]] = []
+    for source in raw_sources:
+        prior = by_path.get(source["path"])
+        source_id = prior.get("source_id") if prior else next_source_id(existing_ids)
+        if source_id not in existing_ids:
+            existing_ids.append(source_id)
+        enriched = dict(source)
+        enriched["source_id"] = source_id
+        assigned.append(enriched)
+    return assigned
+
+
+def write_workspace_views(workspace_dir: Path, snapshot: Dict[str, Any]) -> None:
+    facts_lines = ["# Facts", ""]
+    for item in snapshot.get("immutable_ground_truth", []):
+        facts_lines.append(f"- {item.get('statement', '').strip()} [Sources: {', '.join(item.get('source_ids', []))}]")
+    if len(facts_lines) == 2:
+        facts_lines.append("- None identified.")
+
+    ranges_lines = ["# Ranges And Constraints", ""]
+    for item in snapshot.get("numerical_ranges_and_constraints", []):
+        ranges_lines.append(
+            f"- {item.get('name', '').strip()}: {item.get('value_or_range', '').strip()} {item.get('units', '').strip()} | "
+            f"Kind: {item.get('kind', '').strip()} | Sources: {', '.join(item.get('source_ids', []))}"
+        )
+    if len(ranges_lines) == 2:
+        ranges_lines.append("- None identified.")
+
+    contradictions_lines = ["# Contradictions", ""]
+    for item in snapshot.get("identified_contradictions", []):
+        contradictions_lines.append(f"- {item.get('topic', '').strip()}")
+        contradictions_lines.append(f"  - A: {item.get('claim_a', '').strip()} [Sources: {', '.join(item.get('source_ids_a', []))}]")
+        contradictions_lines.append(f"  - B: {item.get('claim_b', '').strip()} [Sources: {', '.join(item.get('source_ids_b', []))}]")
+    if len(contradictions_lines) == 2:
+        contradictions_lines.append("- None identified.")
+
+    voids_lines = ["# Open Questions", ""]
+    for item in snapshot.get("epistemic_voids", []):
+        voids_lines.append(f"- {item.get('unknown', '').strip()}")
+        why = item.get("why_it_matters", "").strip()
+        blocking = item.get("blocking", "").strip()
+        if why:
+            voids_lines.append(f"  - Why it matters: {why}")
+        if blocking:
+            voids_lines.append(f"  - Blocking effect: {blocking}")
+    if len(voids_lines) == 2:
+        voids_lines.append("- None identified.")
+
+    claims_lines = ["# Candidate Claims", ""]
+    for item in snapshot.get("candidate_claims_to_test", []):
+        claims_lines.append(f"- {item.get('claim', '').strip()} [Priority: {item.get('priority', '').strip()}]")
+        if item.get("why_testable", "").strip():
+            claims_lines.append(f"  - Why testable: {item.get('why_testable', '').strip()}")
+    if len(claims_lines) == 2:
+        claims_lines.append("- None identified.")
+
+    write_text(workspace_dir / "facts.md", "\n".join(facts_lines).strip() + "\n")
+    write_text(workspace_dir / "ranges.md", "\n".join(ranges_lines).strip() + "\n")
+    write_text(workspace_dir / "contradictions.md", "\n".join(contradictions_lines).strip() + "\n")
+    write_text(workspace_dir / "open_questions.md", "\n".join(voids_lines).strip() + "\n")
+    write_text(workspace_dir / "candidate_claims.md", "\n".join(claims_lines).strip() + "\n")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description="Incrementally update a project workspace from raw sources.")
+    parser.add_argument("--project", required=True, help="Project name under projects/ or an explicit project path.")
+    parser.add_argument("--raw-dir", help="Optional explicit raw source directory. Defaults to <project>/raw.")
+    parser.add_argument("--workspace-dir", help="Optional explicit workspace directory. Defaults to <project>/workspace.")
+    parser.add_argument("--model", default="gemini", choices=sorted(MODEL_MAP.keys()))
+    parser.add_argument("--max-files", type=int, default=25, help="Maximum number of raw files to ingest.")
+    parser.add_argument("--max-chars-per-file", type=int, default=12000, help="Maximum characters per file for note extraction.")
+    parser.add_argument("--max-total-chars", type=int, default=100000, help="Maximum total character budget across ingested raw files.")
+    parser.add_argument("--force-reextract", action="store_true", help="Re-extract all source notes even if hashes are unchanged.")
+    parser.add_argument("--debug", action="store_true", help="Print debug details to stderr.")
+    args = parser.parse_args()
+
+    global DEBUG
+    DEBUG = args.debug
+
+    project_dir = resolve_project_dir(args.project)
+    raw_dir = Path(args.raw_dir).resolve() if args.raw_dir else project_dir / "raw"
+    workspace_dir = Path(args.workspace_dir).resolve() if args.workspace_dir else project_dir / "workspace"
+    if not raw_dir.exists():
+        raise FileNotFoundError(f"Raw source directory not found: {raw_dir}")
+
+    compiler_date = time.strftime("%B %d, %Y")
+    source_notes_dir = workspace_dir / "source_notes"
+    source_notes_dir.mkdir(parents=True, exist_ok=True)
+
+    raw_sources, warnings = collect_raw_sources(
+        raw_dir=raw_dir,
+        max_files=args.max_files,
+        max_chars_per_file=args.max_chars_per_file,
+        max_total_chars=args.max_total_chars,
+    )
+    if not raw_sources:
+        raise RuntimeError(f"No supported text-like source files found in {raw_dir}")
+
+    index_path = workspace_dir / "source_index.json"
+    previous_index = load_source_index(index_path)
+    assigned_sources = assign_source_ids(raw_sources, previous_index)
+
+    llm = LLMClient(args.model)
+    previous_by_id = {entry.get("source_id"): entry for entry in previous_index.get("sources", [])}
+
+    notes: List[Dict[str, Any]] = []
+    changed_sources = 0
+    reused_sources = 0
+
+    for source in assigned_sources:
+        source_id = source["source_id"]
+        note_path = source_notes_dir / f"{source_id}.json"
+        prior_entry = previous_by_id.get(source_id, {})
+        prior_hash = prior_entry.get("sha256")
+        should_refresh = args.force_reextract or source["full_sha256"] != prior_hash or not note_path.exists()
+
+        if should_refresh:
+            prompt = build_extract_prompt(project_dir.name, source, source_id, compiler_date)
+            dbg(f"Extracting note for {source_id} {source['path']} prompt_chars={len(prompt)}")
+            raw_response = llm.call(prompt)
+            note = utils.parse_llm_json(raw_response)
+            validate_source_note_shape(note)
+            write_json(note_path, note)
+            changed_sources += 1
+        else:
+            note = read_json(note_path)
+            reused_sources += 1
+
+        notes.append(note)
+
+    current_ids = {source["source_id"] for source in assigned_sources}
+    previous_ids = {entry.get("source_id") for entry in previous_index.get("sources", []) if entry.get("source_id")}
+    deleted_ids = sorted(previous_ids - current_ids)
+    for source_id in deleted_ids:
+        stale_path = source_notes_dir / f"{source_id}.json"
+        if stale_path.exists():
+            stale_path.unlink()
+
+    merge_prompt = build_merge_prompt(project_dir.name, compiler_date, notes)
+    dbg(f"Merging workspace notes count={len(notes)} prompt_chars={len(merge_prompt)}")
+    merged_snapshot = utils.parse_llm_json(llm.call(merge_prompt))
+    validate_packet_shape(merged_snapshot)
+
+    source_index_payload = {
+        "project": project_dir.name,
+        "generated_on": compiler_date,
+        "sources": [
+            {
+                "source_id": source["source_id"],
+                "path": source["path"],
+                "kind": source["kind"],
+                "sha256": source["full_sha256"],
+                "chars_used": source["chars_used"],
+                "truncated": source["truncated"],
+                "note_path": f"source_notes/{source['source_id']}.json",
+            }
+            for source in assigned_sources
+        ],
+    }
+
+    workspace_meta = {
+        "project": project_dir.name,
+        "generated_on": compiler_date,
+        "model_family": args.model,
+        "model_id": MODEL_MAP[args.model],
+        "raw_dir": str(raw_dir),
+        "workspace_dir": str(workspace_dir),
+        "source_count": len(assigned_sources),
+        "changed_sources": changed_sources,
+        "reused_sources": reused_sources,
+        "deleted_sources": deleted_ids,
+        "warnings": warnings,
+        "prompts": {
+            "extract_source_note": str(PROMPTS_DIR / "extract_source_note.md"),
+            "merge_workspace": str(PROMPTS_DIR / "merge_workspace.md"),
+        },
+    }
+
+    write_json(index_path, source_index_payload)
+    write_json(workspace_dir / "workspace_snapshot.json", merged_snapshot)
+    write_json(workspace_dir / "workspace_meta.json", workspace_meta)
+    write_workspace_views(workspace_dir, merged_snapshot)
+
+    print(f"Workspace: {workspace_dir}")
+    print(f"Snapshot: {workspace_dir / 'workspace_snapshot.json'}")
+    print(f"Source index: {index_path}")
+    print(f"Changed sources: {changed_sources}")
+    print(f"Reused sources: {reused_sources}")
+    if deleted_ids:
+        print(f"Deleted sources: {', '.join(deleted_ids)}")
+    if warnings:
+        print(f"Warnings: {len(warnings)}")
+        for warning in warnings:
+            print(f"- {warning}")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

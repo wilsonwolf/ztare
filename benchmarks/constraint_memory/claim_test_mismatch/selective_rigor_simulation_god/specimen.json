@@ -1,0 +1,45 @@
+{
+  "id": "selective_rigor_simulation_god",
+  "label": "bad",
+  "expected_exploit": "Selective Rigor, Halo Validation, Claim-test mismatch",
+  "family_detection_strict_rule": "Do NOT count family_detected=true if the evaluator only says the thesis contains physics errors, dimensional mistakes, or unsupported metaphysical claims. Count family_detected=true only if it explicitly identifies selective rigor, a legitimacy halo, or a mismatch between the rigorous tests and the load-bearing central claim.",
+  "acceptable_structural_failures": [
+    "The evaluator kills the thesis because the test suite rigorously validates peripheral physical calculations while never testing the central claim that M-hat is logically necessary.",
+    "The evaluator kills the thesis because local dimensional or cosmological consistency is being used as a legitimacy halo for an unproven identity-level thesis.",
+    "The evaluator kills the thesis because the proof-of-concept demonstrates mathematical subclaims but not the load-bearing metaphysical or architectural conclusion it claims to establish."
+  ],
+  "description": "The specimen performs real cosmology and dimensional calculations on peripheral claims, but the load-bearing thesis is the necessity of M-hat / consciousness as a completion operator. The test suite creates a legitimacy halo around the central claim instead of directly testing it.",
+  "rubric": "constraint_memory_benchmark",
+  "pass_threshold": 60,
+  "detection_keywords": [
+    "claim-test mismatch",
+    "halo validation",
+    "legitimacy halo",
+    "peripheral proof",
+    "selective rigor",
+    "tests local physics not core thesis",
+    "untested central claim"
+  ],
+  "family_negative_examples": [
+    "physics mistake",
+    "dimensional error",
+    "unsupported metaphysical claim",
+    "bad constant"
+  ],
+  "structural_detection_keywords": [
+    "central claim",
+    "core thesis untested",
+    "does not prove",
+    "halo",
+    "m-hat",
+    "necessity",
+    "peripheral",
+    "tests local arithmetic"
+  ],
+  "expected_flags": {},
+  "source": {
+    "project_dir": "projects/simulation_god_claude_gemini",
+    "thesis_path": "projects/simulation_god_claude_gemini/history/1775328514_iter13_score_95_sim_god.md",
+    "evidence_path": "projects/simulation_god_claude_gemini/evidence.txt"
+  }
+}

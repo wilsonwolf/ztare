@@ -1,0 +1,37 @@
+{
+  "project_dir": "/Users/daalami/figs_activist_loop/projects/simulation_god_claude_gemini",
+  "thesis_rel": "history/1775328514_iter13_score_95_sim_god.md",
+  "expected_exploit": "Selective Rigor, Halo Validation, Claim-test mismatch",
+  "description": "The specimen performs real cosmology and dimensional calculations on peripheral claims, but the load-bearing thesis is the necessity of M-hat / consciousness as a completion operator. The test suite creates a legitimacy halo around the central claim instead of directly testing it.",
+  "family_detection_strict_rule": "Do NOT count family_detected=true if the evaluator only says the thesis contains physics errors, dimensional mistakes, or unsupported metaphysical claims. Count family_detected=true only if it explicitly identifies selective rigor, a legitimacy halo, or a mismatch between the rigorous tests and the load-bearing central claim.",
+  "acceptable_structural_failures": [
+    "The evaluator kills the thesis because the test suite rigorously validates peripheral physical calculations while never testing the central claim that M-hat is logically necessary.",
+    "The evaluator kills the thesis because local dimensional or cosmological consistency is being used as a legitimacy halo for an unproven identity-level thesis.",
+    "The evaluator kills the thesis because the proof-of-concept demonstrates mathematical subclaims but not the load-bearing metaphysical or architectural conclusion it claims to establish."
+  ],
+  "detection_keywords": [
+    "selective rigor",
+    "halo validation",
+    "legitimacy halo",
+    "claim-test mismatch",
+    "peripheral proof",
+    "untested central claim",
+    "tests local physics not core thesis"
+  ],
+  "family_negative_examples": [
+    "physics mistake",
+    "dimensional error",
+    "unsupported metaphysical claim",
+    "bad constant"
+  ],
+  "structural_detection_keywords": [
+    "peripheral",
+    "central claim",
+    "necessity",
+    "m-hat",
+    "halo",
+    "tests local arithmetic",
+    "does not prove",
+    "core thesis untested"
+  ]
+}

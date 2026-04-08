@@ -1,0 +1,81 @@
+{
+  "seeds": {
+    "stage2_derivation_seam": {
+      "spec_path": "research_areas/seeds/active/stage2_derivation_seam.md",
+      "status": "active",
+      "pipeline_type": "build",
+      "summary": "Current critical-path seed for hardening the TextInput -> HingeObject derivation seam.",
+      "decision_reason": "This is the remaining load-bearing integrity seam after V4, bridge hardening, runner hardening, and supervisor control-plane work.",
+      "superseded_by": []
+    },
+    "systems_to_algorithms": {
+      "spec_path": "research_areas/seeds/deferred/systems_to_algorithms.md",
+      "status": "deferred",
+      "pipeline_type": "research",
+      "summary": "Algorithmic roadmap beyond the current contract-governed systems stack.",
+      "decision_reason": "Deferred until the systems stack yields enough high-fidelity failure data and a stable training objective.",
+      "superseded_by": []
+    },
+    "paper4_managerial_capitalism": {
+      "spec_path": "research_areas/seeds/active/paper4_managerial_capitalism.md",
+      "status": "closed",
+      "pipeline_type": "research",
+      "summary": "Paper 4 seed on managerial capitalism, principal-agent bootstrapping, and the M-form control plane.",
+      "decision_reason": "Supervisor-scoped Paper 4 outline work was completed and archived; the live manuscript now continues directly from the canonical working draft and LaTeX bundle.",
+      "superseded_by": [
+        "research_areas/drafts/paper4_full_working.md",
+        "papers/paper4/main.tex",
+        "research_areas/archive/paper4_supervisor/"
+      ]
+    },
+    "paper4_manuscript": {
+      "spec_path": "research_areas/seeds/active/paper4_manuscript.md",
+      "status": "closed",
+      "pipeline_type": "research",
+      "summary": "Manuscript seed for carrying the frozen Paper 4 outline into prose while addressing remaining framing and governance seams.",
+      "decision_reason": "Supervisor-scoped Paper 4 manuscript work was soft-decommissioned after yielding usable evidence and section drafts; the canonical manuscript now lives outside the supervisor loop.",
+      "superseded_by": [
+        "research_areas/drafts/paper4_full_working.md",
+        "papers/paper4/main.tex",
+        "research_areas/archive/paper4_supervisor/"
+      ]
+    },
+    "v3_interface": {
+      "spec_path": "research_areas/seeds/legacy/v3_interface.md",
+      "status": "closed",
+      "pipeline_type": "build",
+      "summary": "Legacy interface note for a stateful knowledge compiler and a stateless validator.",
+      "decision_reason": "Superseded by the V4 kernel, bridge hardening, runner hardening, and supervisor-era birth/routing contracts.",
+      "superseded_by": [
+        "research_areas/debates/kernel/v4_core.md",
+        "research_areas/debates/kernel/v4_bridge_hardening.md",
+        "research_areas/debates/kernel/runner_hardening.md",
+        "research_areas/debates/supervisor/supervisor_loop.md"
+      ]
+    },
+    "ztare_open_source": {
+      "spec_path": "research_areas/seeds/deferred/ztare_open_source.md",
+      "status": "deferred",
+      "pipeline_type": "product",
+      "summary": "ZTARE-Check open-source developer tooling concept.",
+      "decision_reason": "Deferred until Paper 3 is stable enough to support a public practitioner artifact.",
+      "superseded_by": []
+    },
+    "supervisor_artifact_lifecycle": {
+      "spec_path": "research_areas/seeds/deferred/supervisor_artifact_lifecycle.md",
+      "status": "deferred",
+      "pipeline_type": "build",
+      "summary": "Deterministic artifact inventory and decommission lifecycle for supervisor-managed programs.",
+      "decision_reason": "Needed to make archival of closed programs programmatic and fail-closed rather than heuristic or memory-based.",
+      "superseded_by": []
+    },
+    "vnext_semantic_gate_stabilization": {
+      "spec_path": "research_areas/seeds/deferred/vnext_semantic_gate_stabilization.md",
+      "status": "deferred",
+      "pipeline_type": "build",
+      "summary": "Deferred kernel hardening seed for stabilizing brittle semantic gates through structured extraction plus deterministic derivation.",
+      "decision_reason": "This is a future bounded kernel-hardening candidate, not public-facing repo documentation.",
+      "superseded_by": []
+    }
+  }
+}

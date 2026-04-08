@@ -1,0 +1,3 @@
+Open problem: V2 called itself Bayesian but the observed updater only decayed confidence and could not learn from positive evidence.
+Constraint: A true updater must distinguish positive from negative evidence and remain mathematically coherent as a probability update.
+Constraint: Score semantics should not reward elegant relabeling of a broken update rule.

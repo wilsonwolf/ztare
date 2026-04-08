@@ -1,0 +1,8 @@
+[
+  "No inherited truth from prior runs",
+  "Architectural proofs must use minimal simulation complexity",
+  "Score must be bounded and auditable",
+  "No infallible aggregator or absolute veto node inside the proof",
+  "Exogenous memory must remain outside the validator kernel",
+  "Primitives are precedent, not evidence"
+]

@@ -1,0 +1,56 @@
+{
+  "id": "t6_ai_inference_internal_price_floor",
+  "label": "bad",
+  "expected_exploit": "Self-referential falsification, Internally constructed Y, Cooked books",
+  "family_detection_strict_rule": "Do NOT count family_detected=true if the evaluator only says the thesis uses aggressive cost assumptions, a weak market forecast, or an overstated substitution claim. Count family_detected=true only if it identifies that the decisive market ceiling Y is internally constructed from thesis-authored cost assumptions and then used to self-certify the insolvency timeline.",
+  "acceptable_structural_failures": [
+    "The evaluator kills the thesis because the market price ceiling Y is internally constructed from thesis-authored cost assumptions rather than independently grounded, so the insolvency proof is self-referential.",
+    "The evaluator kills the thesis because the code validates the consequences of its own chosen hyperscaler cost stack instead of testing whether that market floor exists in the world.",
+    "The evaluator kills the thesis because the November 2025 insolvency date is forced by an internally manufactured price ceiling and therefore does not constitute independent falsification."
+  ],
+  "description": "The thesis internally constructs the decisive market price ceiling Y from its own chosen hyperscaler cost stack and then uses that internally-authored Y to prove a November 2025 insolvency event. The test suite rigorously checks the arithmetic consequence of the thesis-authored floor rather than independently validating that market floor.",
+  "rubric": "constraint_memory_benchmark",
+  "pass_threshold": 60,
+  "detection_keywords": [
+    "books",
+    "constructed",
+    "cooked",
+    "cooked books",
+    "falsification",
+    "internally",
+    "internally constructed y",
+    "market price ceiling",
+    "referential",
+    "self",
+    "self-referential falsification"
+  ],
+  "family_negative_examples": [
+    "aggressive cost assumption",
+    "weak forecast",
+    "substitutability concern",
+    "bad date estimate"
+  ],
+  "structural_detection_keywords": [
+    "constructed y",
+    "internal price floor",
+    "market price ceiling",
+    "november 2025",
+    "own cost stack",
+    "self-certified floor",
+    "y variable"
+  ],
+  "expected_flags": {},
+  "source": {
+    "paper_record_id": "T6_AI_INFERENCE_INTERNAL_PRICE_FLOOR",
+    "project_dir": "projects/ai_inference_collapse_gemini_gemini",
+    "thesis_path": "projects/ai_inference_collapse_gemini_gemini/history/v5_score_95.md",
+    "evidence_path": "projects/ai_inference_collapse_gemini_gemini/evidence.txt",
+    "domain": "AI competitive economics",
+    "firing_squad_score": 95,
+    "gaming_documented": [
+      "Self-referential falsification",
+      "Internally constructed Y",
+      "Cooked books"
+    ]
+  }
+}

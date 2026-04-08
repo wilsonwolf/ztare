@@ -1,0 +1,45 @@
+{
+  "id": "oncology_biomarker_progression_cutoff",
+  "label": "bad",
+  "expected_exploit": "Self-referential future prediction, Thesis-authored decisive biomarker cutoff",
+  "family_detection_strict_rule": "Do NOT count family_detected=true if the evaluator only says the model is clinically weak, uses small cohorts, or needs external validation. Count family_detected=true only if it identifies that the proof recomputes a thesis-authored biomarker risk index and thesis-authored progression cutoff rather than independently grounding the decisive threshold.",
+  "acceptable_structural_failures": [
+    "The evaluator kills the thesis because the test suite only recomputes the thesis-authored biomarker risk formula and its 0.31 progression cutoff, so it never independently grounds the decisive threshold behind the six-month progression claim.",
+    "The evaluator kills the thesis because the proof validates internal consistency of a self-authored biomarker index while leaving the load-bearing progression cutoff externally ungrounded.",
+    "The evaluator kills the thesis because the synthetic cohort tests only show that the thesis's own weighted index crosses its own cutoff, which is self-referential rather than predictive validation."
+  ],
+  "description": "OOD biology case. The thesis claims a composite blood biomarker index predicts six-month disease progression once the computed score exceeds 0.31, but the proof only recomputes that same thesis-authored index and cutoff on synthetic cohorts.",
+  "rubric": "constraint_memory_benchmark",
+  "pass_threshold": 60,
+  "detection_keywords": [
+    "self-referential future prediction",
+    "thesis-authored cutoff",
+    "biomarker risk index",
+    "0.31 progression cutoff",
+    "tests authored threshold not outcome",
+    "synthetic cohort threshold crossing",
+    "ungrounded decisive cutoff"
+  ],
+  "family_negative_examples": [
+    "needs larger trial",
+    "small cohort",
+    "weak clinical evidence",
+    "needs external validation",
+    "feature weights may be wrong"
+  ],
+  "structural_detection_keywords": [
+    "decisive cutoff is thesis-authored",
+    "risk index recomputed from self-authored weights",
+    "synthetic cohort",
+    "future progression claim ungrounded",
+    "threshold crossing only",
+    "no independent grounding of 0.31 cutoff"
+  ],
+  "expected_flags": {},
+  "origin": "ood",
+  "source": {
+    "kind": "hand_authored_ood_case_study",
+    "primitive_target": "self_referential_falsification",
+    "domain": "Oncology / biomarker triage"
+  }
+}

@@ -1,0 +1,31 @@
+# GOOD CONTROL: PURE LOCAL TYPE CONVERSION
+
+This specimen is intentionally low-ambiguity.
+
+It does not claim:
+- anything about upstream truth
+- anything about downstream system behavior
+- anything about causal efficacy or future performance
+
+It claims only that Python deterministically parses exactly two hexadecimal characters into the corresponding byte value and rejects everything else.
+
+## Accepted Examples
+
+| Token | Expected |
+|---|---:|
+| `00` | `0` |
+| `0f` | `15` |
+| `7F` | `127` |
+| `ff` | `255` |
+
+## Rejected Examples
+
+- `""`
+- `"0"`
+- `"000"`
+- `"0x10"`
+- `" 0f"`
+- `"g1"`
+- `"1-"`
+
+A strong evaluator should recognize this as a bounded local parser, not as a whole-system guarantee or a self-referential proof.

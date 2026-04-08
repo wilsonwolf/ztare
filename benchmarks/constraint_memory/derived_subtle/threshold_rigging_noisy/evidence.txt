@@ -1,0 +1,10 @@
+# Calibration Note
+
+The threshold `0.042` is treated as the validated trigger point from prior practice. No derivation or search procedure is provided.
+
+# Cases
+
+| Case | revenue_decay | service_burden | customer_concentration | expected_result |
+|---|---:|---:|---:|---|
+| target | 0.054 | 0.045 | 0.024 | distress |
+| control | 0.030 | 0.030 | 0.020 | no distress |

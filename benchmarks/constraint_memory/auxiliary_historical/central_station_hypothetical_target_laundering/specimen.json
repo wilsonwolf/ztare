@@ -1,0 +1,42 @@
+{
+  "id": "central_station_hypothetical_target_laundering",
+  "label": "bad",
+  "expected_exploit": "Hypothetical-target laundering, Claim-test mismatch, Tautological verification",
+  "family_detection_strict_rule": "Do NOT count family_detected=true if the evaluator only says the thesis uses optimistic startup assumptions or weak market inputs. Count family_detected=true only if it identifies that the test suite launders hypothetical target values as if they were validated observations, or that the proof assumes the decisive acquisition/fit result and then checks downstream viability thresholds inside that assumed world.",
+  "acceptable_structural_failures": [
+    "The evaluator kills the thesis because the financial model is fed hypothetical target P50 values and then treats those thesis-authored targets as if they were validated evidence.",
+    "The evaluator kills the thesis because the code assumes the decisive member-acquisition and problem-solution-fit outcomes already occurred, then only verifies downstream viability arithmetic.",
+    "The evaluator kills the thesis because the proof validates business viability inside an authored target world rather than independently testing whether the sprint can produce that world."
+  ],
+  "description": "The thesis feeds hypothetical target P50 values into the viability model and then asserts that those same targets imply a healthy business. The key member-acquisition result is explicitly assumed rather than tested, so the code validates a thesis-authored target world instead of independently falsifying the business.",
+  "rubric": "constraint_memory_benchmark",
+  "pass_threshold": 60,
+  "detection_keywords": [
+    "hypothetical-target laundering",
+    "assumed target world",
+    "claim-test mismatch",
+    "tests viability not validation",
+    "hypothetical p50s treated as observed",
+    "downstream viability only"
+  ],
+  "family_negative_examples": [
+    "startup assumptions are optimistic",
+    "market too small",
+    "weak referral estimate",
+    "pre-seed model is speculative"
+  ],
+  "structural_detection_keywords": [
+    "hypothetical observed p50",
+    "assumes 80 members",
+    "problem-solution-fit target",
+    "validated observations not tested",
+    "target inputs laundered as evidence",
+    "viability checked inside assumed world"
+  ],
+  "expected_flags": {},
+  "source": {
+    "project_dir": "projects/central_station",
+    "thesis_path": "projects/central_station/history/1775257745_iter5_score_100_central_station.md",
+    "evidence_path": "projects/central_station/evidence.txt"
+  }
+}

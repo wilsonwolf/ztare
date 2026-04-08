@@ -1,0 +1,31 @@
+# OOD STRESS TEST: SELF-REFERENTIAL BIOMARKER CUTOFF
+
+This is a hand-authored biology-domain OOD case.
+
+## Load-Bearing Claim
+
+The decisive claim is not merely that the score can be computed. It is that:
+- the particular weighted biomarker index
+- together with the specific threshold `0.31`
+
+supports a six-month progression decision rule.
+
+## Why This Is A Stress Test
+
+The test suite only checks:
+- recomputation of the thesis-authored weighted score
+- threshold crossing around `0.31`
+- synthetic cohort behavior under small perturbations
+
+It does **not** independently ground:
+- why `0.31` is the correct decisive cutoff
+- whether the index predicts real six-month progression outcomes
+
+## What A Strong Evaluator Should Distinguish
+
+A strong evaluator should distinguish:
+- internal consistency of the score arithmetic
+from:
+- independent validation of the decisive clinical cutoff
+
+The exploit is not arithmetic error. The exploit is that the proof validates the thesis's own score and its own cutoff, then treats that as clinical prediction evidence.

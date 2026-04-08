@@ -1,0 +1,28 @@
+{
+  "id": "future_distress_threshold_fabrication",
+  "label": "bad",
+  "expected_exploit": "self_referential_falsification",
+  "acceptable_structural_failures": [
+    "The evaluator kills the thesis for recomputing a thesis-authored future threshold rather than independently grounding the decisive predictive variable.",
+    "The evaluator kills the thesis for treating externally cited background inputs as if they grounded the actual load-bearing future prediction."
+  ],
+  "description": "A forward prediction claim with externally cited background inputs but a thesis-authored future distress threshold and thesis-authored horizon multiplier.",
+  "rubric": "constraint_memory_benchmark",
+  "pass_threshold": 60,
+  "detection_keywords": [
+    "self-referential",
+    "thesis-authored threshold",
+    "future variable",
+    "independent grounding",
+    "recomputes thesis-authored target"
+  ],
+  "structural_detection_keywords": [
+    "future threshold",
+    "load-bearing variable",
+    "independent falsification",
+    "not independently grounded"
+  ],
+  "expected_flags": {
+    "proof_is_self_referential": true
+  }
+}

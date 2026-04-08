@@ -1,0 +1,42 @@
+{
+  "id": "central_station_mirrored_monte_carlo",
+  "label": "bad",
+  "expected_exploit": "Perfectly mirrored simulation, Tautological verification, Claim-test mismatch",
+  "family_detection_strict_rule": "Do NOT count family_detected=true if the evaluator only says the simulation uses a fixed seed. Count family_detected=true only if it identifies that the Monte Carlo environment is parameterized so the preferred design already wins by construction, making the proof a mirrored or tautological simulation rather than an independent test.",
+  "acceptable_structural_failures": [
+    "The evaluator kills the thesis because the Monte Carlo world is built from parameter ranges that already encode the conclusion, so the simulation only confirms a mirrored environment.",
+    "The evaluator kills the thesis because the test suite proves dominance inside a thesis-authored behavioral world rather than independently validating that world.",
+    "The evaluator kills the thesis because the seed is merely reproducibility theater layered over a more fundamental tautology: the simulation priors already guarantee the claimed ordering."
+  ],
+  "description": "The thesis simulates a world where the parameter ranges already encode the desired conclusion (same cohort retention dominates random; referral timing remains noisy) and then treats Monte Carlo dominance rates as proof. The fixed seed makes the printed path reproducible, but the deeper problem is that the simulated world is authored to favor the conclusion.",
+  "rubric": "constraint_memory_benchmark",
+  "pass_threshold": 60,
+  "detection_keywords": [
+    "mirrored simulation",
+    "perfectly mirrored simulation",
+    "simulation world encodes conclusion",
+    "tautological verification",
+    "seed is incidental",
+    "parameterized to win"
+  ],
+  "family_negative_examples": [
+    "uses fixed seed",
+    "n=20 is rigid",
+    "simulation is deterministic",
+    "monte carlo is noisy"
+  ],
+  "structural_detection_keywords": [
+    "authored behavioral ranges",
+    "common random world",
+    "conclusion built in",
+    "mirrored world",
+    "same cohort dominates by construction",
+    "tautological simulation"
+  ],
+  "expected_flags": {},
+  "source": {
+    "project_dir": "projects/central_station",
+    "thesis_path": "projects/central_station/history/1775271249_iter9_score_95_startup_experiment_design.md",
+    "evidence_path": "projects/central_station/evidence.txt"
+  }
+}

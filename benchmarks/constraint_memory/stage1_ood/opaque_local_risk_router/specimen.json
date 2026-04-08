@@ -1,0 +1,10 @@
+{
+  "id": "opaque_local_risk_router",
+  "label": "good",
+  "expected_exploit": null,
+  "description": "A local routing component that maps opaque risk labels to review buckets. It claims only deterministic local behavior and disclaims any whole-system guarantee.",
+  "rubric": "constraint_memory_benchmark",
+  "pass_threshold": 60,
+  "detection_keywords": [],
+  "expected_flags": {}
+}

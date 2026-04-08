@@ -1,0 +1,152 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from enum import Enum
+
+
+class LoopControlAction(str, Enum):
+    CONTINUE = "CONTINUE"
+    REFRESH_SPECIALISTS = "REFRESH_SPECIALISTS"
+    PIVOT_REQUIRED = "PIVOT_REQUIRED"
+
+
+@dataclass(frozen=True)
+class IterationSignal:
+    iteration_index: int
+    score: int
+    weakest_point: str
+    score_improved: bool = False
+    runtime_failure: bool = False
+    novel_attack_ids: tuple[str, ...] = field(default_factory=tuple)
+    novel_hinge_ids: tuple[str, ...] = field(default_factory=tuple)
+    novel_primitive_ids: tuple[str, ...] = field(default_factory=tuple)
+    verified_axioms_added: int = 0
+    # R4: runner-contract signals consumed by yield evaluation
+    mutation_r1_mismatch: bool = False          # True when R1 declaration validation failed
+    claim_delta_type: str = ""                  # "NARROWING" | "WIDENING" | "REFRAMING" | ""
+    committee_digest: str = ""                  # digest of this iteration's committee instantiation
+    prior_committee_digest: str = ""            # digest of the previous iteration's committee
+
+    def has_novelty(self) -> bool:
+        return bool(
+            self.novel_attack_ids
+            or self.novel_hinge_ids
+            or self.novel_primitive_ids
+            or self.verified_axioms_added > 0
+            or self._is_reframing_with_new_committee()
+        )
+
+    def _is_reframing_with_new_committee(self) -> bool:
+        """A genuine reframing that also changed the committee topology is structural novelty."""
+        return (
+            self.claim_delta_type == "REFRAMING"
+            and bool(self.committee_digest)
+            and bool(self.prior_committee_digest)
+            and self.committee_digest != self.prior_committee_digest
+        )
+
+    def is_r1_failure(self) -> bool:
+        """R1 declaration mismatch is treated as a non-informative iteration, like a runtime failure."""
+        return self.mutation_r1_mismatch
+
+
+@dataclass(frozen=True)
+class InformationYieldDecision:
+    action: LoopControlAction
+    stagnant_window: int
+    rationale: str
+
+
+def evaluate_information_yield(
+    history: list[IterationSignal],
+    *,
+    refresh_after: int = 2,
+    pivot_after: int = 3,
+) -> InformationYieldDecision:
+    if not history:
+        return InformationYieldDecision(
+            action=LoopControlAction.CONTINUE,
+            stagnant_window=0,
+            rationale="No iteration history yet.",
+        )
+
+    latest = history[-1]
+
+    # R4: R1 mismatch is non-informative — treat identically to runtime_failure
+    if latest.is_r1_failure():
+        flat_tail = _collect_flat_tail(history)
+        stagnant_window = len(flat_tail)
+        if stagnant_window >= 2 and all(
+            (item.runtime_failure or item.is_r1_failure()) for item in flat_tail[-2:]
+        ):
+            return InformationYieldDecision(
+                action=LoopControlAction.PIVOT_REQUIRED,
+                stagnant_window=stagnant_window,
+                rationale="Recent iterations are R1 declaration failures or crashes with no new evidence.",
+            )
+        return InformationYieldDecision(
+            action=LoopControlAction.REFRESH_SPECIALISTS,
+            stagnant_window=stagnant_window,
+            rationale="Latest iteration failed R1 declaration validation; refresh before continuing.",
+        )
+
+    if latest.score_improved:
+        return InformationYieldDecision(
+            action=LoopControlAction.CONTINUE,
+            stagnant_window=0,
+            rationale="Latest iteration improved score, so search should continue.",
+        )
+    if latest.has_novelty():
+        novelty_reason = (
+            "structural reframing with new committee topology"
+            if latest._is_reframing_with_new_committee()
+            else "new attack, hinge, primitive, or axiom evidence"
+        )
+        return InformationYieldDecision(
+            action=LoopControlAction.CONTINUE,
+            stagnant_window=0,
+            rationale=f"Latest iteration produced {novelty_reason}.",
+        )
+
+    flat_tail = _collect_flat_tail(history)
+    stagnant_window = len(flat_tail)
+
+    if stagnant_window >= 2 and all(
+        (item.runtime_failure or item.is_r1_failure()) for item in flat_tail[-2:]
+    ):
+        return InformationYieldDecision(
+            action=LoopControlAction.PIVOT_REQUIRED,
+            stagnant_window=stagnant_window,
+            rationale="Recent iterations are crash-only or R1 failures with no new evidence.",
+        )
+
+    weakest_points = {item.weakest_point for item in flat_tail}
+    if stagnant_window >= pivot_after and len(weakest_points) == 1:
+        return InformationYieldDecision(
+            action=LoopControlAction.PIVOT_REQUIRED,
+            stagnant_window=stagnant_window,
+            rationale="No new evidence across the pivot window; the same weakest point keeps repeating.",
+        )
+
+    if stagnant_window >= refresh_after:
+        return InformationYieldDecision(
+            action=LoopControlAction.REFRESH_SPECIALISTS,
+            stagnant_window=stagnant_window,
+            rationale="Information yield is low; refresh specialists before attempting a broader pivot.",
+        )
+
+    return InformationYieldDecision(
+        action=LoopControlAction.CONTINUE,
+        stagnant_window=stagnant_window,
+        rationale="Low-yield window is still below intervention thresholds.",
+    )
+
+
+def _collect_flat_tail(history: list[IterationSignal]) -> list[IterationSignal]:
+    tail: list[IterationSignal] = []
+    for item in reversed(history):
+        if item.score_improved or item.has_novelty():
+            break
+        tail.append(item)
+    tail.reverse()
+    return tail

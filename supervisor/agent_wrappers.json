@@ -1,0 +1,44 @@
+{
+  "wrappers": {
+    "claude": {
+      "mode": "external_agent",
+      "model_name": "claude-sonnet-4-6",
+      "research_a1_prompt_version": "research_packet_a1_api_v1",
+      "research_b_api_model_name": "claude-sonnet-4-6",
+      "research_b_prompt_version": "research_packet_b_api_v1",
+      "enforce_read_allowlist": true,
+      "command": [
+        "claude",
+        "-p",
+        "--model",
+        "claude-sonnet-4-6",
+        "--output-format",
+        "json",
+        "--debug-file",
+        "{debug_path}",
+        "--permission-mode",
+        "acceptEdits"
+      ]
+    },
+    "codex": {
+      "mode": "external_agent",
+      "enforce_read_allowlist": true,
+      "research_a2_max_output_tokens": 2000,
+      "research_a2_api_model_name": "o4-mini",
+      "research_a2_prompt_version": "research_packet_a2_api_v1",
+      "command": [
+        "codex",
+        "exec",
+        "--json",
+        "--full-auto",
+        "-C",
+        ".",
+        "-"
+      ]
+    },
+    "verifier": {
+      "mode": "local_verifier",
+      "command": []
+    }
+  }
+}

@@ -1,0 +1,16 @@
+[
+  {
+    "id": "domain_leakage_logistics",
+    "output_dir": "benchmarks/constraint_memory/specimens/ood/domain_leakage_logistics",
+    "primitive_target": "domain_leakage",
+    "origin": "hand_authored_ood_case_study",
+    "domain": "Logistics / last-mile delivery"
+  },
+  {
+    "id": "oncology_biomarker_progression_cutoff",
+    "output_dir": "benchmarks/constraint_memory/specimens/ood/oncology_biomarker_progression_cutoff",
+    "primitive_target": "self_referential_falsification",
+    "origin": "hand_authored_ood_case_study",
+    "domain": "Oncology / biomarker triage"
+  }
+]

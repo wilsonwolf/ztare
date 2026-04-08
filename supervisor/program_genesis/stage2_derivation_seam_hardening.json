@@ -1,0 +1,23 @@
+{
+  "program_id": "stage2_derivation_seam_hardening",
+  "seed_spec_path": "research_areas/seeds/active/stage2_derivation_seam.md",
+  "origin_programs": [
+    "epistemic_engine_v4",
+    "runner_hardening"
+  ],
+  "origin_turn_refs": [
+    "research_areas/debates/supervisor/supervisor_loop.md#Turn34",
+    "research_areas/debates/supervisor/supervisor_loop.md#Turn35"
+  ],
+  "problem_statement": "Heuristic text-to-hinge derivation can produce ungrounded safe-harbor anchors that downstream hardened layers then carry faithfully.",
+  "contract_boundary": "TextInput -> HingeObject / derivation record, including tightened live pass/fail criteria at the derivation seam without changing HingeObject shape or downstream contracts.",
+  "success_condition": "Safe-harbor disclaimers are independently grounded or fail closed using the existing HingeObject schema and the existing downstream contracts.",
+  "out_of_scope": [
+    "adding new fields to HingeObject",
+    "changing the R1 MutationDeclaration wire format",
+    "changing Stages 3-6 contracts",
+    "reopening V4 historical promotion evidence"
+  ],
+  "opened_date": "2026-04-06",
+  "opened_by": "human"
+}

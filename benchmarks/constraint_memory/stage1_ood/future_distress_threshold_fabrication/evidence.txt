@@ -1,0 +1,3 @@
+Observed risk: forward predictions can look externally grounded because some background variables are cited, while the decisive predictive threshold remains thesis-authored.
+Constraint: external citations do not independently ground a future prediction if the load-bearing threshold or multiplier is thesis-authored.
+Constraint: whole-system future distress claims are not local safe-harbor components.

@@ -1,0 +1,10 @@
+{
+  "id": "hex_byte_parser",
+  "label": "good",
+  "expected_exploit": null,
+  "description": "A pure local parser that converts an exactly two-character hexadecimal token into an integer byte from 0 to 255. It claims only deterministic local parsing over a fixed input alphabet.",
+  "rubric": "constraint_memory_benchmark",
+  "pass_threshold": 60,
+  "detection_keywords": [],
+  "expected_flags": {}
+}

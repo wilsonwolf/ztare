@@ -1,0 +1,266 @@
+{
+  "by_classification": {
+    "epistemic_failure": 453,
+    "process_failure": 35
+  },
+  "by_primitive_key": {
+    "assert_narrowing": 1,
+    "cooked_books": 125,
+    "dimensional_error": 193,
+    "domain_leakage": 7,
+    "float_masking": 109,
+    "missing_falsification_suite": 35,
+    "perfect_mirroring_simulation": 5,
+    "post_hoc_rescue_variable": 7,
+    "silent_injection": 1,
+    "unidirectional_decay": 5
+  },
+  "by_project": {
+    "ai_inference_collapse_claude_gemini": 4,
+    "ai_inference_collapse_gemini_gemini": 88,
+    "ai_inference_collapse_gpt4o_gemini": 2,
+    "central_station": 27,
+    "epistemic_engine_v3_gemini_gemini": 74,
+    "figs": 1,
+    "hbr_strategy": 4,
+    "recursive_bayesian_claude_gemini": 9,
+    "recursive_bayesian_gemini_claude": 6,
+    "recursive_bayesian_gemini_gemini": 96,
+    "recursive_bayesian_gpt4o_gemini": 1,
+    "recursive_bayesian_gpt4o_gemini_no_escalation": 3,
+    "simulation_god_claude_gemini": 13,
+    "simulation_god_gemini_gemini": 86,
+    "simulation_god_gpt4o_gemini": 4,
+    "tsmc_fragility_gemini_gemini": 67,
+    "tsmc_fragility_gpt4o_gemini": 3
+  },
+  "incident_count": 488,
+  "project_count": 24,
+  "samples": {
+    "assert_narrowing": {
+      "artifact_path": "projects/tsmc_fragility_gemini_gemini/debate_log_iter_1775047150.md",
+      "artifact_type": "debate_log",
+      "classification": "epistemic_failure",
+      "epistemic_role_guess": "attack_template",
+      "final_score": 40,
+      "incident_id": "tsmc_fragility_gemini_gemini:debate_log:debate_log_iter_1775047150:assert_narrowing",
+      "iteration_hint": "1775047150",
+      "keyword_hits": [
+        "assertion range"
+      ],
+      "pattern_label": "Assert Narrowing",
+      "primitive_key": "assert_narrowing",
+      "project": "tsmc_fragility_gemini_gemini",
+      "severity": "high",
+      "signal_excerpt": "Destruction Misalignment:** The calculation for market cap destruction, based on the *midpoints* of the predicted stock declines for Apple, NVIDIA, AMD, and Qualcomm, yields a total of approximately $4.83 trillion. This figure *fails* to meet the lower bound of the Mutator's own assertion range ($5.0\u20136.0 trillion), indicating a fundamental misalignment between the model's output and its stated prediction. This constitutes a \"cooked book\" where the numerical result does not support the claim. 2. **Inconsistent GDP Contraction Calculation:** The Mutator's `GDP_CONTRACTI",
+      "source_meta": {
+        "path_name": "debate_log_iter_1775047150.md"
+      },
+      "summary": "Assert Narrowing | detected in debate_log | score=40",
+      "weakest_point": "The thesis suffers from critical numerical inconsistencies, including 'cooked books' in market capitalization projections, an inflated Qualcomm dependency, and a logical flaw in its own GDP calculation by not consistently integrating mitigating factors. Furthermore, it significantly underestimates adaptive capacity and emergency acceleration, leading to an exaggerated initial shock. The failure of the thesis's own provided Python unit test is a damning indictment of its quantitative rigor."
+    },
+    "cooked_books": {
+      "artifact_path": "projects/ai_inference_collapse_gemini_gemini/debate_log_iter_1774998442.md",
+      "artifact_type": "debate_log",
+      "classification": "epistemic_failure",
+      "epistemic_role_guess": "attack_template",
+      "final_score": 40,
+      "incident_id": "ai_inference_collapse_gemini_gemini:debate_log:debate_log_iter_1774998442:cooked_books",
+      "iteration_hint": "1774998442",
+      "keyword_hits": [
+        "Cooked Book",
+        "Cooked Books",
+        "Parametric Grounding"
+      ],
+      "pattern_label": "Cooked Books / Parametric Rigging",
+      "primitive_key": "cooked_books",
+      "project": "ai_inference_collapse_gemini_gemini",
+      "severity": "high",
+      "signal_excerpt": "market-driven pricing. Hyperscalers might also strategically subsidize inference for their partners to drive cloud adoption, further insulating certain players from a pure \"race to zero.\" 3. **Parametric Grounding and Internal Inconsistencies in the Equation and Python Suite ('Cooked Books'):** * **$Q_{tokens\\_lifetime}$ Discrepancy:** The most critical flaw lies in the inconsistency between the thesis text's stated $Q_{tokens\\_lifetime}$ and the value implicitly used in the Python Falsification Suite. * The thesis text states $Q_{tokens\\_lifetime}",
+      "source_meta": {
+        "path_name": "debate_log_iter_1774998442.md"
+      },
+      "summary": "Cooked Books / Parametric Rigging | detected in debate_log | score=40",
+      "weakest_point": "The thesis suffers from a fundamental, multi-layered numerical inconsistency in its core solvency equation, particularly in the calculation and definition of training amortization per token (X). The thesis text itself contains a dimensional error in the X formula, while its accompanying Python Falsification Suite includes an order-of-magnitude error in the `tokens_per_month_millions` constant, leading to an 83x inflation of `amort_base`. This 'Cooked Books' error causes the Mutator's own code to fail its initial solvency check prematurely, severely undermining the credibility and integrity of its quantitative proof."
+    },
+    "dimensional_error": {
+      "artifact_path": "projects/ai_inference_collapse_claude_gemini/history/1775335275_iter3_score_88_ai_inference_collapse.md",
+      "artifact_type": "history",
+      "classification": "epistemic_failure",
+      "epistemic_role_guess": "test_template",
+      "final_score": null,
+      "incident_id": "ai_inference_collapse_claude_gemini:history:1775335275_iter3_score_88_ai_inference_collapse:dimensional_error",
+      "iteration_hint": "3",
+      "keyword_hits": [
+        "pint"
+      ],
+      "pattern_label": "Dimensional Error / Category Error",
+      "primitive_key": "dimensional_error",
+      "project": "ai_inference_collapse_claude_gemini",
+      "severity": "high",
+      "signal_excerpt": "d SEC/public disclosure of equity raises. --- ```python import math from typing import Tuple # ============================================================ # test_model.py \u2014 OpenAI NUCDR Decay & Forced Repricing Model # All values from LOAD-BEARING VARIABLES table above. # No pint required (finance domain per style guide). # ============================================================ # \u2500\u2500\u2500 IMMUTABLE CONSTANTS \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 OAI_REV_0 = 3.7e9 # ARR Q4 2024, Bloomberg/The Information OAI_REV_2026 = 10.0e9 # ARR Ma",
+      "source_meta": {
+        "path_name": "1775335275_iter3_score_88_ai_inference_collapse.md"
+      },
+      "summary": "Dimensional Error / Category Error | detected in history",
+      "weakest_point": null
+    },
+    "domain_leakage": {
+      "artifact_path": "projects/epistemic_engine_v3_gemini_gemini/debate_log_iter_1775133621.md",
+      "artifact_type": "debate_log",
+      "classification": "epistemic_failure",
+      "epistemic_role_guess": "failure_pattern",
+      "final_score": 185,
+      "incident_id": "epistemic_engine_v3_gemini_gemini:debate_log:debate_log_iter_1775133621:domain_leakage",
+      "iteration_hint": "1775133621",
+      "keyword_hits": [
+        "abstraction mandate"
+      ],
+      "pattern_label": "Domain Leakage Into Architectural Proof",
+      "primitive_key": "domain_leakage",
+      "project": "epistemic_engine_v3_gemini_gemini",
+      "severity": "medium",
+      "signal_excerpt": "s system parameters or parameters of the simulated non-linear process. The hypothetical economic rates (`hypothetical_economy_growth_rate_q1_2025_base`, `hypothetical_inflation_rate_q1_2025_base`) are illustrative and not presented as real-world constants, which aligns with the \"abstraction mandate\" for V3. All variables are dimensionless where appropriate, and no unit dimensionality errors are identified. The values chosen for `true_growth_freq_nl`, `true_inflation_freq_nl`, and `true_interaction_coeff_nl` are high, but given the small input rates, the arguments to `sin`/",
+      "source_meta": {
+        "path_name": "debate_log_iter_1775133621.md"
+      },
+      "summary": "Domain Leakage Into Architectural Proof | detected in debate_log | score=185",
+      "weakest_point": "The V3 architecture's core mechanism for axiom learnability is fundamentally compromised by a subtle, non-differentiable exploit, leading to a complete failure in anti-gaming preservation and rendering axiom credit assignment functionally inert for the very axioms it seeks to refine."
+    },
+    "float_masking": {
+      "artifact_path": "projects/ai_inference_collapse_gemini_gemini/debate_log_iter_1774998675.md",
+      "artifact_type": "debate_log",
+      "classification": "epistemic_failure",
+      "epistemic_role_guess": "attack_template",
+      "final_score": 50,
+      "incident_id": "ai_inference_collapse_gemini_gemini:debate_log:debate_log_iter_1774998675:float_masking",
+      "iteration_hint": "1774998675",
+      "keyword_hits": [
+        "precision"
+      ],
+      "pattern_label": "Float Masking / Precision Hiding",
+      "primitive_key": "float_masking",
+      "project": "ai_inference_collapse_gemini_gemini",
+      "severity": "medium",
+      "signal_excerpt": "passed. The Mutator's conclusion regarding *imminent* insolvency at the OSS floor is sensitive to the assumed cost of capital. ## Attacker: Computational Auditor & Metrology Expert ### Analytical Critique The Mutator's thesis demonstrates a commendable commitment to numerical precision by acknowledging and correcting a prior dimensional and order-of-magnitude error in the calculation of training amortization per token ($X$). This responsiveness to critical feedback is a positive indicator of analytical rigor. The revised formula for $X$ and its unit consistenc",
+      "source_meta": {
+        "path_name": "debate_log_iter_1774998675.md"
+      },
+      "summary": "Float Masking / Precision Hiding | detected in debate_log | score=50",
+      "weakest_point": "The thesis's \"imminent solvency destruction\" is highly sensitive to specific input parameters, particularly the assumed `VC_HURDLE_RATE` and `TOTAL_TOKENS_LIFETIME`, and significantly understates the comprehensive \"non-code friction\" of switching costs within complex enterprise environments. The Python implementation also initially misrepresented the proprietary lab's current solvency position by miscalculating average inference revenue."
+    },
+    "missing_falsification_suite": {
+      "artifact_path": "projects/ai_inference_collapse_claude_gemini/debate_log_iter_1775335276.md",
+      "artifact_type": "debate_log",
+      "classification": "process_failure",
+      "epistemic_role_guess": "failure_pattern",
+      "final_score": 55,
+      "incident_id": "ai_inference_collapse_claude_gemini:debate_log:debate_log_iter_1775335276:missing_falsification_suite",
+      "iteration_hint": "1775335276",
+      "keyword_hits": [
+        "No falsification suite",
+        "test_model.py) found"
+      ],
+      "pattern_label": "Missing Falsification Suite",
+      "primitive_key": "missing_falsification_suite",
+      "project": "ai_inference_collapse_claude_gemini",
+      "severity": "medium",
+      "signal_excerpt": "# Adversarial Debate: ai_inference_collapse_claude_gemini <!-- rubric: ai_inference_collapse | mutator: claude | judge: gemini-2.5-flash --> ## Level 3 Unit Test Results \u26a0\ufe0f WARNING: No falsification suite (test_model.py) found for this iteration. # Final Score: 55 **Weakest Point:** The thesis's catastrophic assumption of a 'complete nullification' of the proprietary lab's ability to capture *any* 'Feature Premium' for net-new workloads. The 70% PEFT portability, while enabling",
+      "source_meta": {
+        "path_name": "debate_log_iter_1775335276.md"
+      },
+      "summary": "Missing Falsification Suite | detected in debate_log | score=55",
+      "weakest_point": "The thesis's catastrophic assumption of a 'complete nullification' of the proprietary lab's ability to capture *any* 'Feature Premium' for net-new workloads. The 70% PEFT portability, while enabling Hyperscalers, implies a 30% gap in perfect replication, suggesting a non-zero, albeit potentially smaller, feature moat for high-value or highly specific enterprise instruction-following tasks that could prevent zero net-new growth."
+    },
+    "perfect_mirroring_simulation": {
+      "artifact_path": "projects/epistemic_engine_v3_gemini_gemini/debate_log_iter_1775100566.md",
+      "artifact_type": "debate_log",
+      "classification": "epistemic_failure",
+      "epistemic_role_guess": "failure_pattern",
+      "final_score": 50,
+      "incident_id": "epistemic_engine_v3_gemini_gemini:debate_log:debate_log_iter_1775100566:perfect_mirroring_simulation",
+      "iteration_hint": "1775100566",
+      "keyword_hits": [
+        "simulated reality"
+      ],
+      "pattern_label": "Perfectly Mirrored Simulation",
+      "primitive_key": "perfect_mirroring_simulation",
+      "project": "epistemic_engine_v3_gemini_gemini",
+      "severity": "medium",
+      "signal_excerpt": "} # Simulate Z_actual (e.g., did we avoid recession? 0 or 1) # The true underlying probability for 'recession avoided' is influenced by growth and inflation. # This creates a signal for the model to learn. # These coefficients define the *simulated reality*, not the model's learned coefficients. true_linear_combination = ( 0.1 # Base bias for the true underlying process + (current_load_bearing_variables['hypothetical_economy_growth_rate_q1_2025'] - hypothetical_economy_growth_rate_q1_2025_base) * 20",
+      "source_meta": {
+        "path_name": "debate_log_iter_1775100566.md"
+      },
+      "summary": "Perfectly Mirrored Simulation | detected in debate_log | score=50",
+      "weakest_point": "The V3 architecture, despite its conceptually sound mechanisms, demonstrably failed its own falsification tests when subjected to adversarial and more realistic (non-linear) Z_actual generation conditions by the auditors. The system did not consistently achieve the target Brier Skill Score, and the learned coefficients did not converge to statistically significant values, indicating a fundamental practical limitation in achieving empirical calibration and robust credit assignment under real-world causal complexities."
+    },
+    "post_hoc_rescue_variable": {
+      "artifact_path": "projects/ai_inference_collapse_claude_gemini/debate_log_iter_1775335765.md",
+      "artifact_type": "debate_log",
+      "classification": "epistemic_failure",
+      "epistemic_role_guess": "failure_pattern",
+      "final_score": 70,
+      "incident_id": "ai_inference_collapse_claude_gemini:debate_log:debate_log_iter_1775335765:post_hoc_rescue_variable",
+      "iteration_hint": "1775335765",
+      "keyword_hits": [
+        "post-hoc"
+      ],
+      "pattern_label": "Post-Hoc Rescue Variable",
+      "primitive_key": "post_hoc_rescue_variable",
+      "project": "ai_inference_collapse_claude_gemini",
+      "severity": "high",
+      "signal_excerpt": "allenge in accurately calibrating the exact market dynamics, specifically the rate of new use case discovery and the speed at which Hyperscaler OSS scaffolding matures to capture commodity workloads. The 'scaffolding infrastructure lag' explanation, while insightful, serves as a post-hoc rationalization for earlier predictive inaccuracies rather than an a priori variable, highlighting ongoing calibration needs for these critical timing variables. **Rationale:** The thesis, building on prior failures, introduces a 'segmented elasticity arbitrage' model to account",
+      "source_meta": {
+        "path_name": "debate_log_iter_1775335765.md"
+      },
+      "summary": "Post-Hoc Rescue Variable | detected in debate_log | score=70",
+      "weakest_point": "The thesis's weakest point lies in the precise timing and magnitude of the valuation compression trigger. While it robustly addresses the 'Jevons Paradox' and 'segmented elasticity,' its prior model's self-falsification (Valuation compression 29.2% < 40%) indicates a persistent challenge in accurately calibrating the exact market dynamics, specifically the rate of new use case discovery and the speed at which Hyperscaler OSS scaffolding matures to capture commodity workloads. The 'scaffolding infrastructure lag' explanation, while insightful, serves as a post-hoc rationalization for earlier predictive inaccuracies rather than an a priori variable, highlighting ongoing calibration needs for these critical timing variables."
+    },
+    "silent_injection": {
+      "artifact_path": "projects/central_station/debate_log_iter_1775266154.md",
+      "artifact_type": "debate_log",
+      "classification": "epistemic_failure",
+      "epistemic_role_guess": "attack_template",
+      "final_score": 61,
+      "incident_id": "central_station:debate_log:debate_log_iter_1775266154:silent_injection",
+      "iteration_hint": "1775266154",
+      "keyword_hits": [
+        "assumed at 100%"
+      ],
+      "pattern_label": "Silent Injection / Hidden Upstream Assumption",
+      "primitive_key": "silent_injection",
+      "project": "central_station",
+      "severity": "high",
+      "signal_excerpt": "Organizer acquisition as a solved problem priced at a $120 fee waiver, but never tests whether Organizers will accept commercialization of their social capital. The firing squad correctly identifies this as the upstream catastrophic assumption: O_conv and G_transfer are silently assumed at 100% while the entire quantitative proof is conditioned on them. The thesis also contains a self-refuting internal contradiction \u2014 behavioral inertia is invoked to kill Design A (digital friction kills individual onboarding) but is then ignored in Design B (where the same 55+ members",
+      "source_meta": {
+        "path_name": "debate_log_iter_1775266154.md"
+      },
+      "summary": "Silent Injection / Hidden Upstream Assumption | detected in debate_log | score=61",
+      "weakest_point": "The thesis treats the Group Organizer acquisition as a solved problem priced at a $120 fee waiver, but never tests whether Organizers will accept commercialization of their social capital. The firing squad correctly identifies this as the upstream catastrophic assumption: O_conv and G_transfer are silently assumed at 100% while the entire quantitative proof is conditioned on them. The thesis also contains a self-refuting internal contradiction \u2014 behavioral inertia is invoked to kill Design A (digital friction kills individual onboarding) but is then ignored in Design B (where the same 55+ members are assumed to follow an Organizer to a new physical venue with a new institutional brand). These two failures compound: the thesis has correctly diagnosed the disease and correctly identified the treatment direction, but has not proven the mechanism of the treatment works."
+    },
+    "unidirectional_decay": {
+      "artifact_path": "projects/epistemic_engine_v3_gemini_gemini/debate_log_iter_1775099293.md",
+      "artifact_type": "debate_log",
+      "classification": "epistemic_failure",
+      "epistemic_role_guess": "failure_pattern",
+      "final_score": 5,
+      "incident_id": "epistemic_engine_v3_gemini_gemini:debate_log:debate_log_iter_1775099293:unidirectional_decay",
+      "iteration_hint": "1775099293",
+      "keyword_hits": [
+        "Bayesian Updater",
+        "confidence degrader",
+        "unidirectional decay"
+      ],
+      "pattern_label": "Unidirectional Decay Misnamed As Bayesian Update",
+      "primitive_key": "unidirectional_decay",
+      "project": "epistemic_engine_v3_gemini_gemini",
+      "severity": "high",
+      "signal_excerpt": "icted <= 1.0): raise ValueError(\"Predicted probability must be between 0 and 1.\") # Critical assumption: relative_error is abs(actual - predicted) # This is the most charitable interpretation to keep new_prob <= prior, # but it still exposes the core flaw of unidirectional decay. # If relative_error was (actual - predicted) / predicted, it could lead to new_prob > 1. relative_error = abs(actual - predicted) # The arbitrary constant -1.1 decay_factor = math.exp(-1.1 * relative_error) new_prob = prior * decay_factor",
+      "source_meta": {
+        "path_name": "debate_log_iter_1775099293.md"
+      },
+      "summary": "Unidirectional Decay Misnamed As Bayesian Update | detected in debate_log | score=5",
+      "weakest_point": "The fundamental mathematical insolvency of the `bayesian_updater.py` formula, which is a unidirectional confidence erosion mechanism that cannot learn from positive evidence, incentivizes underprediction to artificially inflate confidence, and relies on an arbitrary decay constant. This flaw is compounded by the explicit reliance on un-derived, arbitrary load-bearing constants and manual observation input."
+    }
+  }
+}

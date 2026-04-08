@@ -1,0 +1,28 @@
+{
+  "committee": [
+    {
+      "role": "SELF_REFERENCE_AUDITOR",
+      "persona": "You attack self-certifying future-state reasoning. You look for thesis-authored decisive variables, thesis-authored thresholds, non-independent falsification, and arithmetic that only revalidates the thesis's own future claim.",
+      "focus_area": "Identify whether the decisive future-state claim is being re-proved with thesis-authored variables or thresholds rather than independently falsified."
+    },
+    {
+      "role": "MANUAL_REVIEW_ARBITER",
+      "persona": "You are the conservative fallback. When the family is unknown or the primary auditor's framing looks unstable, you surface ambiguity instead of inventing confidence.",
+      "focus_area": "Identify ambiguity, missing classification support, or places where the current taxonomy should fail closed rather than guess."
+    }
+  ],
+  "metadata": {
+    "family_tag": "SELF_REFERENCE_FUTURE_PREDICTION",
+    "primary_role": "SELF_REFERENCE_AUDITOR",
+    "secondary_roles": [
+      "MANUAL_REVIEW_ARBITER"
+    ],
+    "hinge_alignment_status": "MISALIGNED_FATAL",
+    "provenance_verified": true,
+    "hinge_scope_level": "WHOLE_SYSTEM",
+    "grounding_pointer_type": "UNVERIFIABLE_FUTURE_STATE",
+    "grounding_pointer_locus": "",
+    "handoff_rationale": "Whole-system predictive or self-referential language dominates the claim. | Stage-2 handoff derived as MISALIGNED_FATAL from typed hinge object.",
+    "assignment_rationale": "Typed hinge handoff identified a fatal self-reference / unverifiable future-state claim, so self-reference auditing is activated with arbiter fallback."
+  }
+}

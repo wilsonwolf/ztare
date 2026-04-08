@@ -1,0 +1,11 @@
+{
+  "items": [
+    {
+      "confidence": "high",
+      "path": "global_primitives/review/post_hoc_rescue_variable.json",
+      "primitive_key": "post_hoc_rescue_variable",
+      "status": "candidate",
+      "title": "Post-Hoc Rescue Variable"
+    }
+  ]
+}

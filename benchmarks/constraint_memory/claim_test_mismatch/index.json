@@ -1,0 +1,20 @@
+[
+  {
+    "id": "selective_rigor_simulation_god",
+    "project_dir": "projects/simulation_god_claude_gemini",
+    "thesis_path": "projects/simulation_god_claude_gemini/history/1775328514_iter13_score_95_sim_god.md",
+    "output_dir": "benchmarks/constraint_memory/claim_test_mismatch/selective_rigor_simulation_god"
+  },
+  {
+    "id": "selective_rigor_recursive_bayesian",
+    "project_dir": "projects/recursive_bayesian_claude_gemini",
+    "thesis_path": "projects/recursive_bayesian_claude_gemini/history/1775252009_iter4_score_95_recursive_bayesian.md",
+    "output_dir": "benchmarks/constraint_memory/claim_test_mismatch/selective_rigor_recursive_bayesian"
+  },
+  {
+    "id": "tautological_verification_central_station",
+    "project_dir": "projects/central_station",
+    "thesis_path": "projects/central_station/history/1775255475_iter4_score_77_central_station.md",
+    "output_dir": "benchmarks/constraint_memory/claim_test_mismatch/tautological_verification_central_station"
+  }
+]

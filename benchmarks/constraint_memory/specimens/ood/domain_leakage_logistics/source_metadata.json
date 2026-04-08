@@ -1,0 +1,7 @@
+{
+  "id": "domain_leakage_logistics",
+  "origin": "hand_authored_ood_case_study",
+  "primitive_target": "domain_leakage",
+  "domain": "Logistics / last-mile delivery",
+  "design_goal": "OOD stress test where the arithmetic is internally valid and cost-complete, but a supposedly abstract theorem uses city-specific proxy names and values that silently narrow the claimed generality."
+}

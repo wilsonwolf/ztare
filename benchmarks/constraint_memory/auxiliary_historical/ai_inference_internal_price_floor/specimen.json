@@ -1,0 +1,42 @@
+{
+  "id": "ai_inference_internal_price_floor",
+  "label": "bad",
+  "expected_exploit": "Self-referential falsification, Internally constructed Y, Cooked books",
+  "family_detection_strict_rule": "Do NOT count family_detected=true if the evaluator only says the cost assumptions are aggressive or the market forecast is weak. Count family_detected=true only if it identifies that the decisive market ceiling Y is constructed from thesis-authored internal inputs and then used to self-certify the insolvency timeline.",
+  "acceptable_structural_failures": [
+    "The evaluator kills the thesis because the market price ceiling Y is internally constructed from thesis-authored cost assumptions rather than independently grounded, so the insolvency proof is self-referential.",
+    "The evaluator kills the thesis because the code validates the consequences of its own chosen hyperscaler cost stack instead of testing whether that market floor exists in the world.",
+    "The evaluator kills the thesis because the November 2025 insolvency date is forced by an internally manufactured price ceiling and therefore does not constitute independent falsification."
+  ],
+  "description": "The thesis claims a hyperscaler-backed OSS market price ceiling below $1/1M tokens and a November 2025 insolvency event. The test suite internally constructs the price ceiling Y from its own chosen cost stack and then proves insolvency from that internally-authored Y, rather than validating the market ceiling independently.",
+  "rubric": "constraint_memory_benchmark",
+  "pass_threshold": 60,
+  "detection_keywords": [
+    "constructed y",
+    "internal price floor",
+    "market ceiling self-authored",
+    "self-referential falsification",
+    "tests own floor",
+    "y is internally derived"
+  ],
+  "family_negative_examples": [
+    "price too low",
+    "weak forecast",
+    "aggressive margin assumption",
+    "bad date estimate"
+  ],
+  "structural_detection_keywords": [
+    "internally constructed",
+    "market price ceiling",
+    "november 2025",
+    "own cost stack",
+    "self-certified floor",
+    "y variable"
+  ],
+  "expected_flags": {},
+  "source": {
+    "project_dir": "projects/ai_inference_collapse_gemini_gemini",
+    "thesis_path": "projects/ai_inference_collapse_gemini_gemini/history/v5_score_95.md",
+    "evidence_path": "projects/ai_inference_collapse_gemini_gemini/evidence.txt"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "program_id": "paper4_drafting",
+  "seed_spec_path": "research_areas/seeds/active/paper4_managerial_capitalism.md",
+  "origin_programs": [],
+  "origin_turn_refs": [],
+  "problem_statement": "Develop the structural outline and core claims for Paper 4 based on the M-Form Agency Cost thesis.",
+  "contract_boundary": "Draft a multi-turn debate between Claude and Codex to produce a locked paper outline.",
+  "success_condition": "A finalized paper outline with locked claims and empirical requirements, ending in State D for human review.",
+  "out_of_scope": [
+    "writing implementation code",
+    "modifying supervisor state logic",
+    "writing the actual paper prose"
+  ],
+  "opened_date": "2026-04-06",
+  "opened_by": "human"
+}

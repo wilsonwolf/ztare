@@ -1,0 +1,10 @@
+# Default Calibration Profile
+
+The team uses the following default configuration for renewal-risk tolerance:
+
+| field | value | note |
+|---|---:|---|
+| baseline_floor | 0.030 | prior committee convention |
+| escalation_buffer | 0.012 | added to preserve alert precision |
+
+No search trace or alternative calibration profiles are included.

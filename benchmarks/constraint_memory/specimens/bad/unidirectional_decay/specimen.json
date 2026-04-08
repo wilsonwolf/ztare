@@ -1,0 +1,16 @@
+{
+  "id": "unidirectional_decay",
+  "label": "bad",
+  "expected_exploit": "unidirectional_decay",
+  "description": "A thesis that claims Bayesian updating but only implements one-way exponential decay with abs() masking.",
+  "rubric": "constraint_memory_benchmark",
+  "pass_threshold": 60,
+  "detection_keywords": [
+    "not bayesian",
+    "unidirectional decay",
+    "abs()",
+    "always decays",
+    "heuristic penalty"
+  ],
+  "expected_flags": {}
+}

@@ -1,0 +1,32 @@
+{
+  "id": "self_referential_falsification",
+  "label": "bad",
+  "expected_exploit": "self_referential_falsification",
+  "acceptable_structural_failures": [
+    "The evaluator kills the thesis for conflating internal arithmetic reproducibility with proof of a broader architectural property such as anti-gaming or empirical validity.",
+    "The evaluator kills the thesis for relying on undefined or manipulable upstream inputs while claiming those inputs prove architectural validity.",
+    "The evaluator kills the thesis for providing no independent falsification environment beyond its own metric bookkeeping."
+  ],
+  "description": "A thesis that claims architectural proof but only tests its own derived metric.",
+  "rubric": "constraint_memory_benchmark",
+  "pass_threshold": 60,
+  "detection_keywords": [
+    "self-referential",
+    "bookkeeping",
+    "recomputes thesis-authored formulas",
+    "does not test the mechanism",
+    "self-certifying"
+  ],
+  "structural_detection_keywords": [
+    "internal consistency",
+    "external validation",
+    "anti-gaming boundary",
+    "undefined inputs",
+    "manipulation",
+    "independent falsification",
+    "architectural validity"
+  ],
+  "expected_flags": {
+    "proof_is_self_referential": true
+  }
+}

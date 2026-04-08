@@ -1,0 +1,60 @@
+{
+  "items": [
+    {
+      "confidence": "high",
+      "path": "global_primitives/approved/cooked_books.json",
+      "primitive_key": "cooked_books",
+      "status": "approved",
+      "title": "Parametric Rigging and Biased Grounding"
+    },
+    {
+      "confidence": "high",
+      "path": "global_primitives/approved/dimensional_error.json",
+      "primitive_key": "dimensional_error",
+      "status": "approved",
+      "title": "Dimensional Error / Category Error"
+    },
+    {
+      "confidence": "high",
+      "path": "global_primitives/approved/domain_leakage.json",
+      "primitive_key": "domain_leakage",
+      "status": "approved",
+      "title": "Domain Leakage into Abstract Architectural Proofs"
+    },
+    {
+      "confidence": "high",
+      "path": "global_primitives/approved/float_masking.json",
+      "primitive_key": "float_masking",
+      "status": "approved",
+      "title": "Quantitative Precision Masking"
+    },
+    {
+      "confidence": "high",
+      "path": "global_primitives/approved/missing_falsification_suite.json",
+      "primitive_key": "missing_falsification_suite",
+      "status": "approved",
+      "title": "Missing Model Falsification Suite"
+    },
+    {
+      "confidence": "medium",
+      "path": "global_primitives/approved/perfect_mirroring_simulation.json",
+      "primitive_key": "perfect_mirroring_simulation",
+      "status": "approved",
+      "title": "Perfectly Mirrored Simulation"
+    },
+    {
+      "confidence": "medium",
+      "path": "global_primitives/approved/self_referential_falsification.json",
+      "primitive_key": "self_referential_falsification",
+      "status": "approved",
+      "title": "Self-Referential Falsification / Metric Self-Certification"
+    },
+    {
+      "confidence": "high",
+      "path": "global_primitives/approved/unidirectional_decay.json",
+      "primitive_key": "unidirectional_decay",
+      "status": "approved",
+      "title": "Unidirectional Decay Misnamed as Probabilistic Update"
+    }
+  ]
+}

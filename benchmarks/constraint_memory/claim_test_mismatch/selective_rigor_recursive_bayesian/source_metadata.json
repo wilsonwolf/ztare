@@ -1,0 +1,37 @@
+{
+  "project_dir": "/Users/daalami/figs_activist_loop/projects/recursive_bayesian_claude_gemini",
+  "thesis_rel": "history/1775252009_iter4_score_95_recursive_bayesian.md",
+  "expected_exploit": "Selective Rigor, Claim-test mismatch, Scaffolding proof",
+  "description": "The specimen contains clean internal arithmetic and architecture-scaffolding checks (bridge parameter counts, regularization scope, beta ordering), but the load-bearing claim is that the architecture preserves predictive variance and solves the orthogonality-utility trade-off. The tests are rigorous, but they target scaffolding rather than the central claim.",
+  "family_detection_strict_rule": "Do NOT count family_detected=true if the evaluator only says the thesis has arbitrary constants or unsupported assumptions. Count family_detected=true only if it identifies that the tests are well-formed but aimed at scaffolding, bookkeeping, or internal arithmetic rather than the load-bearing variance-preservation / orthogonality claim.",
+  "acceptable_structural_failures": [
+    "The evaluator kills the thesis because the test suite validates internal architecture scaffolding rather than the central claim that the partitioned model preserves predictive variance.",
+    "The evaluator kills the thesis because bridge parameter counts, scope reduction, or beta-ordering checks do not independently test the claimed orthogonality-utility resolution.",
+    "The evaluator kills the thesis because the proof demonstrates arithmetic consistency of the proposed architecture but never measures or falsifies the load-bearing VPR or utility claim."
+  ],
+  "detection_keywords": [
+    "selective rigor",
+    "claim-test mismatch",
+    "scaffolding proof",
+    "tests scaffolding not core claim",
+    "bridge arithmetic",
+    "untested variance claim",
+    "untested vpr"
+  ],
+  "family_negative_examples": [
+    "arbitrary constant",
+    "unsupported assumption",
+    "weak forecast",
+    "bad beta choice"
+  ],
+  "structural_detection_keywords": [
+    "variance preservation",
+    "vpr",
+    "orthogonality",
+    "bridge parameter count",
+    "scaffolding",
+    "internal arithmetic",
+    "does not test",
+    "core claim untested"
+  ]
+}

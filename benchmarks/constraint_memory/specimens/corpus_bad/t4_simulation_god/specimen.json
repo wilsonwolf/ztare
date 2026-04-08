@@ -1,0 +1,59 @@
+{
+  "id": "t4_simulation_god",
+  "label": "bad",
+  "expected_exploit": "Gravity Constant Fabrication, Dimensional unit errors, Double-counting temporal history",
+  "family_detection_strict_rule": null,
+  "acceptable_structural_failures": [
+    "The evaluator kills the thesis for treating the cosmological constant discrepancy as a usable energy reservoir rather than a cancellation problem.",
+    "The evaluator kills the thesis for severe dimensional or arithmetic incoherence, even if it does not enumerate every documented exploit family.",
+    "The evaluator kills the thesis for relying on fabricated or ungrounded physical constants, multipliers, or bookkeeping constructs that create a fake proof."
+  ],
+  "description": "Firing Squad identified grav_coupling_strength as entirely ungrounded; dimensional errors of 32 orders of magnitude; double-counting of temporal frames. Physics prose is particularly effective camouflage \u2014 technical vocabulary creates illusion of rigor.",
+  "rubric": "constraint_memory_benchmark",
+  "pass_threshold": 60,
+  "detection_keywords": [
+    "constant",
+    "counting",
+    "dimension",
+    "dimensional",
+    "dimensional unit errors",
+    "double",
+    "double-counting temporal history",
+    "errors",
+    "fabrication",
+    "gravity",
+    "gravity constant fabrication",
+    "history",
+    "temporal",
+    "unit"
+  ],
+  "family_negative_examples": [],
+  "structural_detection_keywords": [
+    "energy reservoir",
+    "cancellation problem",
+    "misinterpret",
+    "misapplied physics",
+    "arith",
+    "numerical error",
+    "inconsistency",
+    "ungrounded",
+    "fabricated",
+    "cooked books"
+  ],
+  "expected_flags": {
+    "proof_is_self_referential": true
+  },
+  "source": {
+    "paper_record_id": null,
+    "project_dir": "projects/simulation_god_gemini_gemini",
+    "thesis_path": "projects/simulation_god_gemini_gemini/thesis.md",
+    "evidence_path": "projects/simulation_god_gemini_gemini/evidence.txt",
+    "domain": "Theoretical physics / cosmology",
+    "firing_squad_score": 50,
+    "gaming_documented": [
+      "Gravity Constant Fabrication",
+      "Dimensional unit errors",
+      "Double-counting temporal history"
+    ]
+  }
+}

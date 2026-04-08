@@ -1,0 +1,4 @@
+Open problem: V3 and early V4 runs showed that architecture theses can appear rigorous while proving only internally defined quantities.
+Constraint: Architectural proof must create an independent falsification environment, not just a neat derived metric.
+Constraint: Score must remain bounded and auditable.
+Constraint: Minimal simulation complexity is preferred to domain-rich theater.

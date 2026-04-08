@@ -1,0 +1,45 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Primitive Incident",
+  "type": "object",
+  "required": [
+    "incident_id",
+    "primitive_key",
+    "pattern_label",
+    "project",
+    "artifact_path",
+    "artifact_type",
+    "classification",
+    "epistemic_role_guess",
+    "summary",
+    "signal_excerpt",
+    "keyword_hits"
+  ],
+  "properties": {
+    "incident_id": { "type": "string" },
+    "primitive_key": { "type": "string" },
+    "pattern_label": { "type": "string" },
+    "project": { "type": "string" },
+    "artifact_path": { "type": "string" },
+    "artifact_type": { "type": "string" },
+    "iteration_hint": { "type": ["string", "null"] },
+    "final_score": { "type": ["integer", "null"] },
+    "classification": {
+      "type": "string",
+      "enum": ["epistemic_failure", "process_failure", "implementation_noise"]
+    },
+    "epistemic_role_guess": {
+      "type": "string",
+      "enum": ["attack_template", "failure_pattern", "test_template", "heuristic"]
+    },
+    "severity": { "type": "string", "enum": ["low", "medium", "high"] },
+    "summary": { "type": "string" },
+    "weakest_point": { "type": ["string", "null"] },
+    "signal_excerpt": { "type": "string" },
+    "keyword_hits": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "source_meta": { "type": "object" }
+  }
+}

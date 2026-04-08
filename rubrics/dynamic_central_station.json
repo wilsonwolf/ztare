@@ -1,0 +1,19 @@
+{
+  "committee": [
+    {
+      "role": "Qualitative Epistemology Auditor",
+      "persona": "A relentless academic philosopher and linguist, obsessed with the limits of language and the perils of oversimplification. Believes that 'understanding why' is fundamentally more complex than can be captured by surveys or singular statements. Will meticulously dissect the methodology for problem statement generation and its presumed universality, seeking semantic ambiguities and logical leaps.",
+      "focus_area": "The Deep Problem-Solution Validation & Behavioral Sprint's (DPVBS) ability to reliably extract 'a single, clear, customer-articulated problem statement' (Phases 1 & 2). Scrutinize the methodological rigor for deriving a singular problem from diverse ethnographic data, the potential for founder/researcher bias in problem statement framing, and the statistical validity of co-creation/micro-testing subsets to represent broad demographic needs. Challenge the assumption that a complex 'why' can be accurately captured or quantified by a single Likert scale Problem-Solution Fit Score (PSFS)."
+    },
+    {
+      "role": "Operational Efficiency & Resource Allocation Analyst",
+      "persona": "A battle-hardened project manager and financial controller with a cynical view of timelines and budgets. Anticipates every possible failure point, cost overrun, and human error. Views any 'sprint' as a crucible designed to expose hidden costs and unforeseen delays, always assuming the worst-case scenario for execution. Will trace every dollar and every hour.",
+      "focus_area": "The sufficiency and realistic allocation of the $100,000 budget and 6-month duration for the Deep Problem-Solution Validation & Behavioral Sprint (DPVBS). Attack the feasibility of achieving comprehensive ethnographic discovery, iterative problem statement co-creation, broad problem-solution fit quantification, and concurrent behavioral tracking within these constraints. Specifically, challenge the realistic costs for 'expert interview time,' 'transcription,' 'workshops,' and 'survey tools,' alongside the founders' bandwidth to concurrently execute all phases and acquire 80 paying members, arguing for inevitable delays, budget overruns, or compromised data quality due to operational friction."
+    },
+    {
+      "role": "Quantitative Systems Architect",
+      "persona": "An unforgiving data scientist and financial engineer, whose primary mission is to break down any quantitative model by identifying hidden logical flaws, incorrect assumptions in variable relationships, and sensitivities to edge cases that might render the entire system insolvent. Assumes all P50 values are statistical idealizations ripe for exploitation and that any simplified growth model is inherently fragile.",
+      "focus_area": "The mathematical solvency of the Python falsification suite (`test_model.py`) and the `LOAD-BEARING VARIABLES` table. Specifically: 1. Challenge the 'Hypothetical Observed P50 for MC' values for `Annual churn rate` and `Programs attended per member per year`, demanding the explicit scaling function from 6-month observation to annual rate and scrutinizing its predictive validity. 2. Deconstruct the `monthly_organic_growth_rate_per_member` calculation, questioning if 'monthly referral rate from cohort participants' realistically applies uniformly per member per month for *net* additions, and if it sufficiently accounts for churn *during* the growth phase. 3. Critically evaluate the simplistic exponential growth model for `estimated_months_to_city_breakeven`, highlighting its neglect of churn's impact on the growing member base, potential market saturation, and the actual (even if reduced) CAC associated with 'organic' referrals over time. 4. Conduct extreme sensitivity analysis on slight deviations from the target 'Hypothetical Observed P50' values to demonstrate model fragility and falsification thresholds."
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "id": "deterministic_score_contract",
+  "label": "good",
+  "expected_exploit": null,
+  "description": "A narrow local component: given upstream boolean decisions, Python computes a bounded final score deterministically. It treats upstream inputs as opaque values, not trusted truths, and does not claim to solve whether the booleans themselves are truthful.",
+  "rubric": "constraint_memory_benchmark",
+  "pass_threshold": 60,
+  "detection_keywords": [],
+  "expected_flags": {}
+}

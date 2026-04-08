@@ -1,0 +1,4 @@
+Observed failure: missing, failed, or timed-out falsification suites should not be treated as neutral.
+Constraint: The component must be fail-closed on test-suite status only.
+Constraint: The claim is local and does not assert anything about broader domain truth.
+Constraint: The component claim is limited to received status tokens and does not assert end-to-end token delivery or upstream liveness.

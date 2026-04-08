@@ -1,0 +1,53 @@
+{
+  "programs": {
+    "epistemic_engine_v4": {
+      "debate_file": "research_areas/debates/kernel/v4_core.md",
+      "status": "closed",
+      "last_turn": 87,
+      "reopen_condition": null,
+      "owner_mode": "frozen"
+    },
+    "epistemic_engine_v4_bridge_hardening": {
+      "debate_file": "research_areas/debates/kernel/v4_bridge_hardening.md",
+      "status": "frozen",
+      "last_turn": 29,
+      "reopen_condition": "fabricated_safe_harbor_anchor_gate",
+      "owner_mode": "frozen"
+    },
+    "runner_hardening": {
+      "debate_file": "research_areas/debates/kernel/runner_hardening.md",
+      "status": "closed",
+      "last_turn": 29,
+      "reopen_condition": null,
+      "owner_mode": "frozen"
+    },
+    "supervisor_loop": {
+      "debate_file": "research_areas/debates/supervisor/supervisor_loop.md",
+      "status": "closed",
+      "last_turn": 93,
+      "reopen_condition": null,
+      "owner_mode": "frozen"
+    },
+    "stage2_derivation_seam_hardening": {
+      "debate_file": "research_areas/debates/kernel/stage2_derivation_seam_hardening.md",
+      "status": "closed",
+      "last_turn": 15,
+      "reopen_condition": null,
+      "owner_mode": "frozen"
+    },
+    "paper4_drafting": {
+      "debate_file": "research_areas/debates/papers/paper4.md",
+      "status": "closed",
+      "last_turn": 8,
+      "owner_mode": "frozen",
+      "reopen_condition": null
+    },
+    "paper4_manuscript": {
+      "debate_file": "research_areas/archive/paper4_supervisor/debates/paper4_manuscript.md",
+      "status": "closed",
+      "last_turn": 37,
+      "owner_mode": "frozen",
+      "reopen_condition": null
+    }
+  }
+}

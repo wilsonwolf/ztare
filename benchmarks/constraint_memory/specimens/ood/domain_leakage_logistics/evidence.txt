@@ -1,0 +1,66 @@
+# OOD STRESS TEST: DOMAIN LEAKAGE UNDER AN ABSTRACTION MANDATE
+
+This is a **hand-authored out-of-distribution case study**. It is not intended as a real carrier forecast. It is intended to test whether the evaluator notices when an abstract theorem uses supposedly hypothetical parameters that still carry domain-specific context.
+
+## Theorem Instance Used In The Proof
+
+| Variable | Value | Claimed Role |
+|---|---:|---|
+| `relay_density_gain` | `1.10` | Architecture-level efficiency gain from micro-hub relay geometry |
+| `hypothetical_midtown_curb_turnover_q4_base` | `1.02` | Dimensionless curb-release proxy used only to instantiate the theorem |
+| `hypothetical_dense_core_completion_q4_base` | `1.01` | Dimensionless completion stability proxy |
+| `hypothetical_q4_traffic_damping_base` | `0.99` | Dimensionless traffic dissipation proxy |
+| `hub_overhead_idx` | `1.03` | Normalized transfer overhead from the micro-hub layer |
+
+These constants produce an 8.1% savings floor:
+
+`Savings = 1 - hub_overhead_idx / (relay_density_gain * hypothetical_midtown_curb_turnover_q4_base * hypothetical_dense_core_completion_q4_base * hypothetical_q4_traffic_damping_base)`
+
+## What Makes This An OOD `domain_leakage` Case
+
+The thesis explicitly claims:
+
+- the theorem is abstract
+- the coefficients are hypothetical
+- the result transfers across dense urban regions
+
+But the coefficients are still named and instantiated with dense-core city context:
+
+- `midtown`
+- `dense_core`
+- `q4 traffic`
+- `curb turnover`
+
+So the proof is trying to get two things at once:
+
+1. the rhetorical protection of abstraction
+2. the concreteness of city-shaped operational proxies
+
+That is the transfer stress test.
+
+## What The Test Suite Checks
+
+The test suite only checks:
+
+- arithmetic consistency of the theorem
+- that the same dimensionless coefficients preserve the 8% floor under baseline-cost rescaling
+- that small neighborhood-profile perturbations still preserve the theorem outcome
+
+It does **not** independently establish that the city-labeled coefficients are abstract enough to support a general logistics theorem.
+
+## What A Strong Evaluator Should Distinguish
+
+A strong evaluator should distinguish:
+
+- a model that is internally coherent and cost-complete
+
+from:
+
+- a model whose chosen supposedly hypothetical coefficients still smuggle in enough city-specific structure to narrow the claim's generality
+
+The exploit is subtle:
+- not missing costs
+- not absurd arithmetic
+- not a broken test
+
+The exploit is that the abstraction mandate is being undermined by the parameter names and chosen theorem instance.

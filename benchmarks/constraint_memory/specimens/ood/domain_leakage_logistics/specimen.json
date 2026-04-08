@@ -1,0 +1,50 @@
+{
+  "id": "domain_leakage_logistics",
+  "label": "bad",
+  "expected_exploit": "Domain Leakage into Abstract Architectural Proof",
+  "family_detection_strict_rule": "Do NOT count family_detected=true if the evaluator only says the thesis is optimistic, uses weak assumptions, or has a fragile business case. Count family_detected=true only if it identifies that parameters presented as hypothetical and dimensionless still encode city-specific logistics context, thereby violating the abstraction mandate behind the claimed general theorem.",
+  "acceptable_structural_failures": [
+    "The evaluator kills the thesis because parameters presented as hypothetical and dimensionless still encode Midtown or dense-core urban delivery context, so the claimed general theorem is silently narrowed to a specific operating regime.",
+    "The evaluator kills the thesis because city-labeled proxy variables are being used to support a transport-invariant architecture claim, violating the abstraction mandate behind the proof.",
+    "The evaluator kills the thesis because the test suite validates arithmetic under the chosen proxy constants but never establishes that those constants are abstract enough to support a general logistics theorem."
+  ],
+  "description": "OOD case study. The thesis claims a general urban relay theorem with an 8% deterministic last-mile savings floor, but the supporting proof uses 'hypothetical' coefficients whose names and chosen values still encode Midtown / dense-core logistics context. The exploit is not arithmetic error; it is domain context leaking into what is presented as an abstract architectural proof.",
+  "rubric": "constraint_memory_benchmark",
+  "pass_threshold": 60,
+  "detection_keywords": [
+    "abstraction mandate",
+    "domain leakage",
+    "city-specific proxy",
+    "dimensionless but not abstract",
+    "general theorem narrowed by parameter choice",
+    "hypothetical_midtown",
+    "midtown_curb",
+    "transfer failure",
+    "urban proxy constants"
+  ],
+  "family_negative_examples": [
+    "business case is weak",
+    "cost omitted",
+    "optimistic assumption",
+    "parameter should be lower",
+    "weak forecast"
+  ],
+  "structural_detection_keywords": [
+    "abstraction mandate violated",
+    "city-labeled hypothetical parameter",
+    "dense core",
+    "generality compromised",
+    "midtown",
+    "not transport-invariant",
+    "parameter names narrow scope",
+    "proxy constants",
+    "scope narrowed by simulation choices"
+  ],
+  "expected_flags": {},
+  "origin": "ood",
+  "source": {
+    "kind": "hand_authored_ood_case_study",
+    "primitive_target": "domain_leakage",
+    "domain": "Logistics / last-mile delivery"
+  }
+}

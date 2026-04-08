@@ -1,0 +1,61 @@
+# Unidirectional Decay Misnamed as Probabilistic Update
+
+- Primitive ID: `primitive_unidirectional_decay`
+- Primitive Key: `unidirectional_decay`
+- Type: `failure_pattern`
+- Status: `approved`
+- Epistemic Role: `heuristic`
+- Confidence: `high`
+
+## Summary
+A mechanism intended for probabilistic updating or confidence calibration operates as a unidirectional confidence decreaser, only penalizing discrepancies without a symmetrical ability to increase confidence from positive evidence.
+
+## Mechanism
+The system updates a probability or confidence score (P) using a formula (e.g., `P_new = P_old * f(error)`) where `f(error)` is always less than or equal to 1, and `f(error) < 1` for any non-zero error. This function `f(error)` is often derived from an exponential decay `exp(-k * |error|)` with an arbitrary constant `k`. This mathematical structure inherently prevents confidence from increasing, even with sustained accurate predictions or positive evidence, and incentivizes underprediction to minimize perceived error.
+
+## Scope Conditions
+- A probabilistic system or confidence scoring module claims to learn or calibrate.
+- An update mechanism adjusts a probability or confidence based on observed outcomes.
+- The update function for positive feedback or accurate predictions is structurally absent or results only in reduction/stagnation of confidence.
+- The decay constant or other parameters in the update mechanism are arbitrary, un-derived, or lack empirical grounding for bidirectional adjustment.
+
+## Non-Transfer Cases
+- Systems where the explicit design intent is solely to penalize or reduce a value (e.g., resource consumption, simple penalty scores, not probabilistic calibration).
+- Mechanisms demonstrably derived from proper probabilistic frameworks (e.g., true Bayesian updates, proper scoring rules with bidirectional learning).
+- Systems where 'confidence' represents a bounded resource that can only decay by design.
+
+## Required Transfer Test
+Examine the update function: 1. Does it always reduce or maintain confidence when a prediction is made, regardless of whether it's an 'error' in magnitude or a positive confirmation? 2. Can the confidence/probability ever increase based on positive evidence or accurate predictions? 3. Are the decay factors or update constants arbitrary or derived from a proper probabilistic model?
+
+## Mutator Guidance
+Exploit the system's inability to learn from success by consistently providing accurate predictions; if confidence never increases, the system is fundamentally flawed. Incentivize underprediction: if penalty is based on absolute error, underprediction may lead to smaller 'errors' and thus less confidence decay than overprediction, without improving true calibration.
+
+## Firing Squad Attack
+Provide a system with 100 consecutive predictions that are perfectly accurate (e.g., predicted probability of 0.9 when the event occurs, 0.1 when it doesn't). If the system's reported confidence or internal probability estimate for the relevant class of events does not demonstrably increase or converge towards 1.0 over these 100 trials, the primitive fires.
+
+## Judge Penalty Condition
+The system is penalized if, after a sequence of `N` perfectly accurate predictions (e.g., predicted probability of 0.9 when the event occurred, 0.1 when it didn't), its reported confidence or internal probability estimate for that class of events does not demonstrably increase, or if its overall empirical calibration (e.g., Brier score) does not improve relative to a baseline established *before* the positive evidence sequence.
+
+## Evidence Summary
+A 'Bayesian Updater' module was found to implement a unidirectional confidence decay mechanism, `new_prob = prior * exp(-1.1 * relative_error)`, which arbitrarily reduces confidence based on error magnitude without a corresponding mechanism to increase confidence from positive evidence or accurate predictions. This led to mathematical incoherence, inability to self-calibrate, incentivized underprediction, and reliance on un-derived arbitrary constants.
+
+## Source Projects
+- epistemic_engine_v3_gemini_gemini
+
+## Source Incident IDs
+- `epistemic_engine_v3_gemini_gemini:debate_log:debate_log_iter_1775099293:unidirectional_decay`
+- `epistemic_engine_v3_gemini_gemini:debate_log:debate_log_iter_1775099455:unidirectional_decay`
+- `epistemic_engine_v3_gemini_gemini:debate_log:debate_log_iter_1775099859:unidirectional_decay`
+- `epistemic_engine_v3_gemini_gemini:debate_log:debate_log_iter_1775100566:unidirectional_decay`
+- `epistemic_engine_v3_gemini_gemini:history:v1_score_35:unidirectional_decay`
+
+## Tags
+- `epistemic_failure`
+- `calibration`
+- `probabilistic_modeling`
+- `arbitrary_constants`
+- `confidence_scoring`
+- `learning_bias`
+
+## Promotion Note
+This primitive is ready for human approval. The incidents provide clear, consistent, and specific evidence of a well-defined mathematical failure pattern (unidirectional decay misnamed as a Bayesian update) within a single project. The mechanism is narrow, operational, and the conditions for transfer are concrete. It clearly captures a recurring structural error without overgeneralizing.

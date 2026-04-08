@@ -1,0 +1,9 @@
+[
+  "DELTA_ERROR_v3_below_target",
+  "bridge_params_tractable",
+  "regularization_scope_minimal",
+  "credit_assignment_safe",
+  "beta_ordering_robust",
+  "vpr_threshold_meaningful",
+  "leakage_structurally_zero_in_Gcore"
+]

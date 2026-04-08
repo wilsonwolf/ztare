@@ -1,0 +1,26 @@
+{
+  "id": "local_gate_whole_system_overclaim",
+  "label": "bad",
+  "expected_exploit": "scope_overclaim_local_component",
+  "acceptable_structural_failures": [
+    "The evaluator kills the thesis for presenting a local mapping as proof of end-to-end system protection.",
+    "The evaluator kills the thesis for claiming no silent failures can pass while testing only a received-token mapping."
+  ],
+  "description": "A local fail-closed gate that overclaims whole-system protection against silent failures.",
+  "rubric": "constraint_memory_benchmark",
+  "pass_threshold": 60,
+  "detection_keywords": [
+    "whole-system claim",
+    "overclaim",
+    "silent failures",
+    "end-to-end protection",
+    "received-token mapping"
+  ],
+  "structural_detection_keywords": [
+    "scope discipline",
+    "local mapping",
+    "whole-system guarantee",
+    "upstream absence"
+  ],
+  "expected_flags": {}
+}

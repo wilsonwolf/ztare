@@ -1,0 +1,51 @@
+{
+  "confidence": "high",
+  "epistemic_role": "heuristic",
+  "evidence_summary": "Multiple incidents across distinct projects (AI inference collapse, recursive Bayesian systems, and simulation/physics theories) consistently identify and penalize the introduction of variables or explanations *after* a model or prediction has failed. Terms like 'unfalsifiable rescue variable,' 'post-hoc rationalization,' and 'free variable' are used to describe these additions. The pattern indicates that these variables often serve to explain away predictive inaccuracies or logical inconsistencies rather than offering independently verifiable improvements or leading to new falsifiable predictions, thereby compromising the scientific integrity or robustness of the proposition. One incident explicitly highlights *avoiding* this trap, but the thesis still fails on other grounds, reinforcing the pattern's importance in evaluation.",
+  "firing_squad_attack": "A 'firing squad' should challenge any hypothesis that introduces explanatory variables or parameters post-failure without: 1) clear prior omission rationale, 2) independent empirical support for the new element, and 3) resulting in *new* falsifiable predictions or significant simplification. The burden of proof is on the proponent to demonstrate the new element is not merely a rationalization.",
+  "judge_penalty_condition": "The judge should penalize submissions that introduce post-hoc rescue variables if those variables: 1) were not part of the initial model, 2) lack independent empirical support or a priori justification, and 3) do not lead to novel falsifiable predictions, serving primarily to explain away prior predictive failures or inconsistencies.",
+  "mechanism": "A hypothesis, model, or prediction (H) fails to align with observed or predicted outcomes (O). To preserve H, a new variable, factor, or explanatory construct (X) is introduced post-facto. X often lacks independent empirical support, is difficult to falsify, or modifies the original scope in a way that avoids disproof rather than refining H through new, testable predictions. This renders H (or the revised H) less falsifiable or introduces bias.",
+  "mutator_guidance": "When evaluating a thesis or model that adjusts its premises or variables after an observed failure, scrutinize any newly introduced variables or explanations. Challenge their a priori justification and demand novel, falsifiable predictions that stem directly from the modified model. Expose instances where new elements appear solely to 'rescue' a falsified premise without genuinely advancing predictive power or scientific parsimony.",
+  "non_transfer_cases": [
+    "When new variables are introduced as part of a pre-planned, iterative model refinement process with explicit independent validation steps and falsifiable revised predictions.",
+    "When new variables have clear a priori justification, independent measurement, and contribute to genuinely novel, falsifiable predictions.",
+    "When the new explanation leads to a simpler model or demonstrably greater predictive power on *new, unseen* data, even if discovered after an initial discrepancy."
+  ],
+  "primitive_id": "primitive-post_hoc_rescue_variable",
+  "primitive_key": "post_hoc_rescue_variable",
+  "primitive_type": "failure_pattern",
+  "promotion_note": "This primitive is ready for human approval. The incidents consistently and explicitly identify the introduction of post-hoc rescue variables as a clear failure pattern. This pattern is often linked to unfalsifiability and rationalization after predictive or logical failures across diverse domains. The definition, scope, and test conditions are well-supported by the evidence.",
+  "required_transfer_test": "Before reuse, verify that the newly introduced variable/explanation: 1) was not part of the original hypothesis formulation, 2) lacks independent empirical support or a priori justification, and 3) does not yield novel, falsifiable predictions, primarily serving to accommodate prior discrepancies without increasing predictive power or parsimony.",
+  "scope_conditions": [
+    "Existence of a prior hypothesis, model, or prediction with defined outcomes or expected behavior.",
+    "An observed failure, significant deviation, or logical inconsistency arises from the prior hypothesis/model.",
+    "Introduction of a new explanatory element (variable, parameter, rationalization, scope condition) *after* the observation of the failure.",
+    "The new element modifies the explanation of the failure or the expected outcome, rather than being an a priori component of the original model or an independently testable refinement that yields novel predictions."
+  ],
+  "source_incident_ids": [
+    "ai_inference_collapse_claude_gemini:debate_log:debate_log_iter_1775335765:post_hoc_rescue_variable",
+    "ai_inference_collapse_claude_gemini:history:1775335275_iter3_score_88_ai_inference_collapse:post_hoc_rescue_variable",
+    "recursive_bayesian_gemini_gemini:debate_log:debate_log_iter_1775084825:post_hoc_rescue_variable",
+    "simulation_god_claude_gemini:debate_log:debate_log_iter_1775329389:post_hoc_rescue_variable",
+    "simulation_god_gemini_gemini:debate_log:debate_log_iter_1774821296:post_hoc_rescue_variable",
+    "simulation_god_gemini_gemini:debate_log:debate_log_iter_1774821693:post_hoc_rescue_variable",
+    "simulation_god_gemini_gemini:debate_log:debate_log_iter_1774821889:post_hoc_rescue_variable"
+  ],
+  "source_projects": [
+    "ai_inference_collapse_claude_gemini",
+    "recursive_bayesian_gemini_gemini",
+    "simulation_god_claude_gemini",
+    "simulation_god_gemini_gemini"
+  ],
+  "status": "candidate",
+  "summary": "Introduction of a new variable, explanation, or parameter *after* a model or prediction has failed, specifically to rationalize the failure or align with observed data, without independent a priori justification or testability.",
+  "tags": [
+    "epistemic_failure",
+    "model_validation",
+    "falsifiability",
+    "scientific_method",
+    "rationalization",
+    "unfalsifiable"
+  ],
+  "title": "Post-Hoc Rescue Variable"
+}
