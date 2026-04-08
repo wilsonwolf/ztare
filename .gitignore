@@ -59,3 +59,7 @@ benchmarks/constraint_memory/runs/
 # 10. In-repo supervisor active runs (ephemeral operator state)
 supervisor/active_runs/*
 !supervisor/active_runs/README.md
+
+# Local roadshow/publication planning scratch
+research_areas/debates/planning/roadshow.md
+research_areas/seeds/deferred/systems_to_algorithms.md

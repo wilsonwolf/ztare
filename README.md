@@ -91,6 +91,13 @@ Important:
 - the supervisor loop does **not** supersede kernel hardening
 - it exists to make kernel hardening and future program work less manual
 
+Public technical provenance for the hardening path lives in:
+- `research_areas/debates/kernel/v4_core.md`
+- `research_areas/debates/kernel/runner_hardening.md`
+- `research_areas/debates/kernel/v4_bridge_hardening.md`
+- `research_areas/debates/kernel/stage2_derivation_seam_hardening.md`
+- `research_areas/debates/supervisor/supervisor_loop.md`
+
 In short:
 
 - kernel loop = improve the evaluator
