@@ -220,6 +220,63 @@ make v4-meta-run-current
 make v4-meta-reset
 ```
 
+### Step 5a: Branch After `UNDERIDENTIFIED`
+
+If a project reaches `UNDERIDENTIFIED`, do not overwrite the active thesis ad hoc.
+
+Use project-local hypothesis bundles instead:
+
+```text
+projects/<project>/
+  thesis.md
+  test_model.py
+  workspace/
+  hypotheses/
+    <candidate_name>/
+      thesis.md
+      test_model.py   # optional
+      notes.md
+```
+
+Why:
+
+- the active thesis and active falsification suite must travel together
+- copying only a new `thesis.md` can leave a stale `test_model.py` evaluating the wrong object
+- `workspace/` is machine-owned and should not hold operator exploration notes
+
+Recommended workflow:
+
+1. preserve the current best branch as its own hypothesis bundle
+2. draft alternative candidates under `hypotheses/`
+3. promote one candidate into the project root
+4. run a fresh loop episode
+5. compare against the preserved baseline
+
+For `eu_union_stability`, use:
+
+```bash
+python projects/eu_union_stability/promote_hypothesis.py <candidate_name> --clear-status
+python -m src.ztare.validator.autoresearch_loop \
+  --project eu_union_stability \
+  --rubric eu_union_integration \
+  --iters 3 \
+  --mutator_model claude \
+  --judge_model claude \
+  --deterministic_score_gates
+```
+
+`promote_hypothesis.py` does three things safely:
+
+- copies the candidate `thesis.md` into the project root
+- copies the candidate `test_model.py` if present
+- otherwise deletes the stale project-root `test_model.py` so the next run fail-closes instead of evaluating a new thesis with an old suite
+
+Optional:
+
+- `--clear-status` archives stale workspace status files for operator clarity
+
+This is a project workflow convention, not a supervisor feature.
+
 These commands are for the kernel-local promotion runner, not the supervisor control plane.
 
 V4 bounded debate-orchestration shortcuts:

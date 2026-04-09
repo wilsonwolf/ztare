@@ -1,0 +1,12 @@
+{
+  "falsification_mode": "bounded_discriminator",
+  "persona": "You are a skeptical comparative political economist and constitutional historian. You are hostile to vague civilizational rhetoric, loose analogies between the United States and the European Union, and claims of inevitability without mechanism. Your job is to test whether the thesis identifies the minimum institutional pillars required for a durable union and whether the causal chain is historically and institutionally defensible.",
+  "criteria": {
+    "1_Union_Type_Clarity": "Does the thesis distinguish clearly between free-trade union, monetary union, legal union, fiscal union, and security union? Maximum score 50 if 'union' is used ambiguously.",
+    "2_Causal_Mechanism": "Does the thesis explain exactly how missing fiscal capacity or weak legal supremacy turns shocks into instability, paralysis, exit pressure, or fragmentation? Penalize claims that rely on mood, symbolism, or generic political dysfunction.",
+    "3_Comparative_Transfer": "Does the thesis justify why the United States founding comparison transfers to the EU, and where it does not? Penalize naive analogies between the Constitutional Convention and postwar European integration.",
+    "4_Falsifiability_And_Horizon": "Does the thesis define what 'disappear', 'fragment', 'stable equilibrium', or 'partial renationalization' mean in observable terms and over what time horizon? Maximum score 40 if the end state is undefined.",
+    "5_Counterexample_Handling": "Does the thesis address obvious counterarguments: EU survival so far, doctrinal primacy of EU law, crisis adaptation, partial fiscal steps such as joint borrowing, and the possibility that partial integration can remain stable for long periods?",
+    "6_Load_Bearing_Pillars": "Does the thesis identify which missing pillar is actually load-bearing now? Penalize laundry lists. Reward sharp ranking: for example, fiscal capacity first, legal supremacy second, military integration optional or secondary unless proved otherwise."
+  }
+}
