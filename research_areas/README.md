@@ -2,6 +2,7 @@
 
 This folder now has distinct layers by artifact role:
 
+- `research_areas/private/`: ignored principal-facing exploratory notes, strategy drafts, and confidential architecture thinking that should not ship publicly yet
 - `research_areas/seeds/active/*.md`: active seed specs currently eligible for genesis-opened work
 - `research_areas/seeds/deferred/*.md`: deferred future seeds
 - `research_areas/seeds/legacy/*.md`: superseded historical seed specs kept for provenance
@@ -32,4 +33,5 @@ Canonical debate groups:
 - `debates/kernel/`
 - `debates/planning/`
 - `debates/supervisor/`
-- `debates/product/`
+
+Use seeds / manifests / program plans when the work has already been promoted into a bounded packet.

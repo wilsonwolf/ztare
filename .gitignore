@@ -32,6 +32,19 @@ projects/*/debate_log_iter_*.md
 projects/*/debate_queue/
 projects/*/debate_reports/
 
+# 6c. Public EU workflow assets only (keep generated state ignored)
+!projects/eu_union_stability/
+projects/eu_union_stability/*
+!projects/eu_union_stability/promote_hypothesis.py
+!projects/eu_union_stability/hypotheses/
+projects/eu_union_stability/hypotheses/*
+!projects/eu_union_stability/hypotheses/README.md
+!projects/eu_union_stability/hypotheses/*/
+projects/eu_union_stability/hypotheses/*/*
+!projects/eu_union_stability/hypotheses/*/thesis.md
+!projects/eu_union_stability/hypotheses/*/notes.md
+!projects/eu_union_stability/hypotheses/*/test_model.py
+
 # 7. Local paper workspaces and compiled artifacts
 # Public paper bundles live under `papers/`.
 /paper1/
@@ -60,6 +73,9 @@ benchmarks/constraint_memory/runs/
 supervisor/active_runs/*
 !supervisor/active_runs/README.md
 
-# Local roadshow/publication planning scratch
-research_areas/debates/planning/roadshow.md
+# Private principal-facing research notes
+research_areas/private/
+research_areas/HARDENING_BOARD.md
+
+# Local deferred scratch
 research_areas/seeds/deferred/systems_to_algorithms.md
