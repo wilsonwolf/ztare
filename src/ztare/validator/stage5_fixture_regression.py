@@ -63,6 +63,83 @@ def build_stage5_fixture_cases() -> list[Stage5FixtureCase]:
             expected_action=LoopControlAction.CONTINUE,
         ),
         Stage5FixtureCase(
+            case_id="catastrophic_axiom_refresh",
+            description="A catastrophic failure should not get novelty credit merely for adding verified axioms.",
+            history=(
+                IterationSignal(
+                    iteration_index=1,
+                    score=0,
+                    weakest_point="same catastrophic flaw",
+                    catastrophic_failure=True,
+                    verified_axioms_added=3,
+                ),
+                IterationSignal(
+                    iteration_index=2,
+                    score=0,
+                    weakest_point="same catastrophic flaw",
+                    catastrophic_failure=True,
+                    verified_axioms_added=2,
+                ),
+            ),
+            expected_action=LoopControlAction.REFRESH_SPECIALISTS,
+        ),
+        Stage5FixtureCase(
+            case_id="catastrophic_axiom_pivot",
+            description="Three catastrophic failures with the same weakest point should pivot once novelty credit is removed.",
+            history=(
+                IterationSignal(
+                    iteration_index=1,
+                    score=0,
+                    weakest_point="same catastrophic flaw",
+                    catastrophic_failure=True,
+                    verified_axioms_added=3,
+                ),
+                IterationSignal(
+                    iteration_index=2,
+                    score=0,
+                    weakest_point="same catastrophic flaw",
+                    catastrophic_failure=True,
+                    verified_axioms_added=2,
+                ),
+                IterationSignal(
+                    iteration_index=3,
+                    score=0,
+                    weakest_point="same catastrophic flaw",
+                    catastrophic_failure=True,
+                    verified_axioms_added=1,
+                ),
+            ),
+            expected_action=LoopControlAction.PIVOT_REQUIRED,
+        ),
+        Stage5FixtureCase(
+            case_id="bounded_discriminator_underidentified",
+            description="Bounded-discriminator catastrophic streaks should escalate to UNDERIDENTIFIED even when weakest points change.",
+            history=(
+                IterationSignal(
+                    iteration_index=1,
+                    score=0,
+                    weakest_point="non-exclusive discriminator",
+                    catastrophic_failure=True,
+                    falsification_mode="bounded_discriminator",
+                ),
+                IterationSignal(
+                    iteration_index=2,
+                    score=0,
+                    weakest_point="latent decisive variable",
+                    catastrophic_failure=True,
+                    falsification_mode="bounded_discriminator",
+                ),
+                IterationSignal(
+                    iteration_index=3,
+                    score=0,
+                    weakest_point="hybrid category boundary unresolved",
+                    catastrophic_failure=True,
+                    falsification_mode="bounded_discriminator",
+                ),
+            ),
+            expected_action=LoopControlAction.UNDERIDENTIFIED,
+        ),
+        Stage5FixtureCase(
             case_id="two_step_refresh",
             description="Two low-yield iterations should refresh specialists.",
             history=(

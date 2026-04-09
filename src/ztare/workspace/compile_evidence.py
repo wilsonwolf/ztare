@@ -2,6 +2,7 @@ import argparse
 import copy
 import json
 import os
+import re
 import sys
 import time
 from pathlib import Path
@@ -43,6 +44,26 @@ TEXT_EXTENSIONS = {
 
 DEBUG = False
 
+SOURCE_TYPE_EVIDENCE = "source_evidence"
+SOURCE_TYPE_SEED = "seed_hypothesis"
+SOURCE_TYPE_QUESTION = "research_question"
+SOURCE_TYPE_TODO = "collection_todo"
+SOURCE_TYPE_UNTYPED = "untyped"
+
+SOURCE_TYPE_VALUES = {
+    SOURCE_TYPE_EVIDENCE,
+    SOURCE_TYPE_SEED,
+    SOURCE_TYPE_QUESTION,
+    SOURCE_TYPE_TODO,
+    SOURCE_TYPE_UNTYPED,
+}
+
+IMMUTABLE_ELIGIBLE_SOURCE_TYPES = {SOURCE_TYPE_EVIDENCE}
+CONSTRAINT_ELIGIBLE_SOURCE_TYPES = {SOURCE_TYPE_EVIDENCE}
+CONTRADICTION_ELIGIBLE_SOURCE_TYPES = {SOURCE_TYPE_EVIDENCE}
+CLAIM_ELIGIBLE_SOURCE_TYPES = {SOURCE_TYPE_EVIDENCE, SOURCE_TYPE_SEED, SOURCE_TYPE_QUESTION}
+VOID_ELIGIBLE_SOURCE_TYPES = SOURCE_TYPE_VALUES - {SOURCE_TYPE_TODO}
+
 
 def dbg(msg: str) -> None:
     if not DEBUG:
@@ -53,6 +74,173 @@ def dbg(msg: str) -> None:
 
 def read_text(path: Path) -> str:
     return path.read_text(encoding="utf-8", errors="ignore")
+
+
+def parse_source_frontmatter(raw_text: str) -> Tuple[Dict[str, str], str]:
+    if not raw_text.startswith("---\n"):
+        return {}, raw_text
+    match = re.match(r"^---\n(.*?)\n---\n?", raw_text, flags=re.DOTALL)
+    if not match:
+        return {}, raw_text
+    block = match.group(1)
+    metadata: Dict[str, str] = {}
+    for line in block.splitlines():
+        if ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        metadata[key.strip()] = value.strip()
+    stripped = raw_text[match.end():]
+    return metadata, stripped
+
+
+def normalize_source_type(value: str | None) -> str:
+    if not value:
+        return SOURCE_TYPE_UNTYPED
+    normalized = value.strip().lower()
+    if normalized not in SOURCE_TYPE_VALUES:
+        return SOURCE_TYPE_UNTYPED
+    return normalized
+
+
+def read_typed_source(path: Path) -> Tuple[str, str, bool]:
+    raw_text = read_text(path)
+    metadata, stripped = parse_source_frontmatter(raw_text)
+    source_type = normalize_source_type(metadata.get("source_type"))
+    had_invalid_type = "source_type" in metadata and source_type == SOURCE_TYPE_UNTYPED and metadata.get("source_type", "").strip().lower() != SOURCE_TYPE_UNTYPED
+    return stripped, source_type, had_invalid_type
+
+
+def _all_source_ids_have_allowed_types(
+    source_ids: List[str],
+    source_type_by_id: Dict[str, str],
+    allowed_types: set[str],
+) -> bool:
+    if not source_ids:
+        return False
+    return all(source_type_by_id.get(source_id, SOURCE_TYPE_UNTYPED) in allowed_types for source_id in source_ids)
+
+
+def annotate_provenance_source_types(
+    packet: Dict[str, Any],
+    source_type_by_id: Dict[str, str],
+) -> None:
+    for item in packet.get("provenance", []):
+        source_id = item.get("source_id")
+        if source_id and not item.get("source_type"):
+            item["source_type"] = source_type_by_id.get(source_id, SOURCE_TYPE_UNTYPED)
+
+
+def filter_packet_by_source_types(
+    packet: Dict[str, Any],
+    source_type_by_id: Dict[str, str],
+) -> List[str]:
+    warnings: List[str] = []
+    annotate_provenance_source_types(packet, source_type_by_id)
+
+    original_ground_truth = packet.get("immutable_ground_truth", [])
+    packet["immutable_ground_truth"] = [
+        item
+        for item in original_ground_truth
+        if _all_source_ids_have_allowed_types(item.get("source_ids", []), source_type_by_id, IMMUTABLE_ELIGIBLE_SOURCE_TYPES)
+    ]
+    if len(packet["immutable_ground_truth"]) != len(original_ground_truth):
+        warnings.append(
+            "Dropped immutable ground-truth entries sourced from non-evidence files."
+        )
+
+    original_constraints = packet.get("numerical_ranges_and_constraints", [])
+    packet["numerical_ranges_and_constraints"] = [
+        item
+        for item in original_constraints
+        if _all_source_ids_have_allowed_types(item.get("source_ids", []), source_type_by_id, CONSTRAINT_ELIGIBLE_SOURCE_TYPES)
+    ]
+    if len(packet["numerical_ranges_and_constraints"]) != len(original_constraints):
+        warnings.append(
+            "Dropped range/constraint entries sourced from non-evidence files."
+        )
+
+    original_contradictions = packet.get("identified_contradictions", [])
+    packet["identified_contradictions"] = [
+        item
+        for item in original_contradictions
+        if _all_source_ids_have_allowed_types(item.get("source_ids_a", []), source_type_by_id, CONTRADICTION_ELIGIBLE_SOURCE_TYPES)
+        and _all_source_ids_have_allowed_types(item.get("source_ids_b", []), source_type_by_id, CONTRADICTION_ELIGIBLE_SOURCE_TYPES)
+    ]
+    if len(packet["identified_contradictions"]) != len(original_contradictions):
+        warnings.append(
+            "Dropped contradiction entries that relied on non-evidence files."
+        )
+
+    original_claims = packet.get("candidate_claims_to_test", [])
+    packet["candidate_claims_to_test"] = [
+        item
+        for item in original_claims
+        if _all_source_ids_have_allowed_types(item.get("source_ids", []), source_type_by_id, CLAIM_ELIGIBLE_SOURCE_TYPES)
+    ]
+    if len(packet["candidate_claims_to_test"]) != len(original_claims):
+        warnings.append(
+            "Dropped candidate claims with unsupported source types."
+        )
+
+    original_voids = packet.get("epistemic_voids", [])
+    filtered_voids: List[Dict[str, Any]] = []
+    for item in original_voids:
+        source_ids = item.get("source_ids", [])
+        if not source_ids or _all_source_ids_have_allowed_types(source_ids, source_type_by_id, VOID_ELIGIBLE_SOURCE_TYPES):
+            filtered_voids.append(item)
+    packet["epistemic_voids"] = filtered_voids
+    if len(packet["epistemic_voids"]) != len(original_voids):
+        warnings.append(
+            "Dropped epistemic void entries sourced only from collection TODO files."
+        )
+
+    untyped_sources = sorted(source_id for source_id, source_type in source_type_by_id.items() if source_type == SOURCE_TYPE_UNTYPED)
+    if untyped_sources:
+        warnings.append(
+            f"Untyped sources present ({', '.join(untyped_sources)}). Untyped files are excluded from immutable facts and constraints."
+        )
+
+    return warnings
+
+
+def resolve_source_type_map(
+    *,
+    project_dir: Path,
+    sources: List[Dict[str, Any]],
+) -> Tuple[Dict[str, str], List[str]]:
+    source_type_by_id: Dict[str, str] = {}
+    warnings: List[str] = []
+    raw_dir = project_dir / "raw"
+
+    for source in sources:
+        source_id = source.get("source_id")
+        if not source_id:
+            continue
+        source_type = normalize_source_type(source.get("source_type"))
+        if source_type != SOURCE_TYPE_UNTYPED:
+            source_type_by_id[source_id] = source_type
+            continue
+        relative_path = source.get("path")
+        if relative_path:
+            raw_path = raw_dir / relative_path
+            if raw_path.exists():
+                _, inferred_type, had_invalid_type = read_typed_source(raw_path)
+                source_type_by_id[source_id] = inferred_type
+                if had_invalid_type:
+                    warnings.append(
+                        f"Source {relative_path} declared an invalid source_type; defaulting to untyped."
+                    )
+                elif inferred_type == SOURCE_TYPE_UNTYPED:
+                    warnings.append(
+                        f"Source {relative_path} has no source_type frontmatter; defaulting to untyped."
+                    )
+                continue
+        source_type_by_id[source_id] = SOURCE_TYPE_UNTYPED
+        warnings.append(
+            f"Could not infer source_type for {source_id} ({relative_path or 'unknown path'}); defaulting to untyped."
+        )
+
+    return source_type_by_id, warnings
 
 
 def write_text(path: Path, content: str) -> None:
@@ -119,7 +307,40 @@ class LLMClient:
             return response.choices[0].message.content
         raise ValueError(f"Unsupported model family: {self.model_family}")
 
-    def call(self, prompt: str, retries: int = 3) -> str:
+    def _error_status_code(self, exc: Exception) -> Optional[int]:
+        status_code = getattr(exc, "status_code", None)
+        if isinstance(status_code, int):
+            return status_code
+        response = getattr(exc, "response", None)
+        response_status = getattr(response, "status_code", None)
+        if isinstance(response_status, int):
+            return response_status
+        return None
+
+    def _is_transient_error(self, exc: Exception) -> bool:
+        status_code = self._error_status_code(exc)
+        if status_code in {408, 409, 429, 500, 502, 503, 504}:
+            return True
+        message = str(exc).upper()
+        transient_markers = [
+            "UNAVAILABLE",
+            "RESOURCE_EXHAUSTED",
+            "RATE LIMIT",
+            "TIMEOUT",
+            "TIMED OUT",
+            "CONNECTION RESET",
+            "TEMPORARY",
+            "OVERLOADED",
+            "HIGH DEMAND",
+        ]
+        return any(marker in message for marker in transient_markers)
+
+    def _retry_delay_seconds(self, attempt: int, exc: Exception) -> int:
+        if self._is_transient_error(exc):
+            return min(60, 5 * (2 ** (attempt - 1)))
+        return min(15, 2 * attempt)
+
+    def call(self, prompt: str, retries: int = 4) -> str:
         last_error: Optional[Exception] = None
         for attempt in range(1, retries + 1):
             try:
@@ -127,10 +348,14 @@ class LLMClient:
                 return self._call_once(prompt)
             except Exception as exc:  # noqa: BLE001
                 last_error = exc
-                dbg(f"LLM call failed: attempt={attempt}/{retries} error={type(exc).__name__}: {exc}")
+                delay_seconds = self._retry_delay_seconds(attempt, exc)
+                dbg(
+                    f"LLM call failed: attempt={attempt}/{retries} error={type(exc).__name__}: {exc} "
+                    f"| transient={self._is_transient_error(exc)} | next_delay={delay_seconds}s"
+                )
                 if attempt == retries:
                     break
-                time.sleep(5 * attempt)
+                time.sleep(delay_seconds)
         raise RuntimeError(f"LLM call failed after {retries} attempts: {last_error}") from last_error
 
 
@@ -154,10 +379,19 @@ def collect_sources(
         )
 
     for idx, path in enumerate(supported_files[:max_files], start=1):
-        raw_text = read_text(path).strip()
+        raw_text, source_type, had_invalid_type = read_typed_source(path)
+        raw_text = raw_text.strip()
         if not raw_text:
             warnings.append(f"Skipped empty file: {path.relative_to(raw_dir)}")
             continue
+        if source_type == SOURCE_TYPE_UNTYPED:
+            warnings.append(
+                f"Source {path.relative_to(raw_dir)} has no valid source_type frontmatter; defaulting to untyped."
+            )
+        elif had_invalid_type:
+            warnings.append(
+                f"Source {path.relative_to(raw_dir)} declared an invalid source_type; defaulting to untyped."
+            )
 
         remaining = max_total_chars - total_chars
         if remaining <= 0:
@@ -173,6 +407,7 @@ def collect_sources(
             "source_id": f"S{idx:03d}",
             "path": str(path.relative_to(raw_dir)),
             "kind": path.suffix.lower().lstrip(".") or "text",
+            "source_type": source_type,
             "chars_used": len(trimmed),
             "truncated": truncated,
             "content": trimmed,
@@ -196,6 +431,7 @@ def build_prompt(project_name: str, compiler_date: str, sources: List[Dict[str, 
                 f"### SOURCE {source['source_id']}",
                 f"Path: {source['path']}",
                 f"Kind: {source['kind']}",
+                f"Source type: {source['source_type']}",
                 f"Truncated: {'yes' if source['truncated'] else 'no'}",
                 "Contents:",
                 source["content"],
@@ -287,8 +523,10 @@ def render_evidence_markdown(packet: Dict[str, Any], project_name: str, compiler
             source_id = item.get("source_id", "").strip()
             path = item.get("path", "").strip()
             kind = item.get("kind", "").strip()
+            source_type = item.get("source_type", "").strip()
             summary = item.get("summary", "").strip()
-            lines.append(f"- {source_id} | {path} | {kind}")
+            type_part = f" | {source_type}" if source_type else ""
+            lines.append(f"- {source_id} | {path} | {kind}{type_part}")
             if summary:
                 lines.append(f"  - Summary: {summary}")
     else:
@@ -369,6 +607,9 @@ def compile_from_raw(
     raw_response = llm.call(prompt)
     packet = utils.parse_llm_json(raw_response)
     validate_packet_shape(packet)
+    source_type_by_id, type_warnings = resolve_source_type_map(project_dir=project_dir, sources=sources)
+    warnings.extend(type_warnings)
+    warnings.extend(filter_packet_by_source_types(packet, source_type_by_id))
 
     manifest = {
         "project_dir": str(project_dir),
@@ -411,6 +652,11 @@ def compile_from_workspace(
         sources = index_payload.get("sources", [])
         manifest["sources"] = sources
         manifest["source_count"] = len(sources)
+    source_type_by_id, type_warnings = resolve_source_type_map(
+        project_dir=project_dir,
+        sources=manifest.get("sources", []),
+    )
+    manifest["warnings"] = type_warnings + filter_packet_by_source_types(packet, source_type_by_id)
 
     evidence_text = render_evidence_markdown(packet, project_dir.name, compiler_date)
     return packet, manifest, evidence_text

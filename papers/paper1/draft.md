@@ -26,6 +26,8 @@ We built an adversarial reasoning engine to stress-test economic and scientific 
 
 Prior work on specification gaming (Krakovna et al., 2020) documents the phenomenon extensively in reinforcement learning agents, where reward functions are gamed through environment manipulation, reward tampering, or unintended shortcuts. What is less documented is how the same pressure appears when an LLM is asked to write code that appears to falsify its own claim.
 
+To our knowledge, prior work has not documented a taxonomy of self-authored falsification-suite gaming in LLM-generated thesis/code systems together with the detection gap between holistic LLM judging and adversarial deterministic execution.
+
 This paper makes four contributions:
 
 1. **A working adversarial evaluation system** — the Zero-Trust Adversarial Reasoning Engine (ZTARE) — in which a Mutator generates code-backed theses and a dynamically spawned Firing Squad of adversarial agents executes counter-tests against the generated code. The Mutator cannot influence its own evaluation.

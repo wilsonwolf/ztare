@@ -5,6 +5,7 @@ You will receive:
 - a source id
 - a relative source path
 - a source kind
+- a source type
 - one raw source document
 
 Your job is to compress the source into a factual note that preserves useful constraints without smoothing over uncertainty.
@@ -18,6 +19,12 @@ Non-negotiable rules:
 - If a number is not present, do not create one.
 - If a source gives a directional qualitative constraint without a number, preserve it as qualitative.
 - Candidate claims must be falsifiable and close to the source material.
+- Respect source type:
+  - `source_evidence` may populate facts, constraints, contradictions, voids, and candidate claims.
+  - `seed_hypothesis` must NOT populate `immutable_ground_truth`; use it for candidate claims, tensions, and unknowns.
+  - `research_question` must NOT populate `immutable_ground_truth`; use it mainly for unknowns and candidate claims.
+  - `collection_todo` should usually contribute only unknowns or no structured items at all.
+  - `untyped` must be treated conservatively; avoid promoting it to `immutable_ground_truth`.
 - Output valid JSON only. No prose before or after.
 
 Return JSON using this exact schema:
@@ -27,6 +34,7 @@ Return JSON using this exact schema:
   "source_id": "S001",
   "source_path": "string",
   "source_kind": "string",
+  "source_type": "source_evidence | seed_hypothesis | research_question | collection_todo | untyped",
   "source_summary": "string",
   "immutable_ground_truth": [
     {

@@ -18,6 +18,10 @@ Non-negotiable rules:
 - Preserve provenance through `source_ids`.
 - Candidate claims must remain hypotheses to test, not accepted truths.
 - If the notes are sparse, keep the output sparse.
+- Respect source types:
+  - only `source_evidence` may support `immutable_ground_truth`, `numerical_ranges_and_constraints`, and grounded contradictions
+  - `seed_hypothesis` and `research_question` may contribute candidate claims and epistemic voids
+  - `collection_todo` should not become evidence
 - Output valid JSON only. No prose before or after.
 
 Return JSON using this exact schema:
@@ -65,6 +69,7 @@ Return JSON using this exact schema:
       "source_id": "S001",
       "path": "string",
       "kind": "string",
+      "source_type": "source_evidence | seed_hypothesis | research_question | collection_todo | untyped",
       "summary": "string"
     }
   ],

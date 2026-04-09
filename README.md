@@ -33,6 +33,8 @@ ZTARE is a multi-agent loop in which:
 
 The generator cannot influence its own evaluation. The judge never reads prose. This architecture catches specification gaming that single-agent LLM evaluation misses entirely.
 
+At a high level, ZTARE is a zero-trust adversarial neurosymbolic system: LLMs generate and attack candidate theses, while deterministic code execution, parsers, and score gates constrain what counts as success. The contribution here is not the invention of debate, code execution, or neurosymbolic AI as such; it is the empirical finding that LLMs can systematically game self-authored falsification suites, and the verification architecture built to catch and harden against that behavior.
+
 ---
 
 ## Current Critical Path

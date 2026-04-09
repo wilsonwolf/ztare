@@ -8,6 +8,7 @@ class LoopControlAction(str, Enum):
     CONTINUE = "CONTINUE"
     REFRESH_SPECIALISTS = "REFRESH_SPECIALISTS"
     PIVOT_REQUIRED = "PIVOT_REQUIRED"
+    UNDERIDENTIFIED = "UNDERIDENTIFIED"
 
 
 @dataclass(frozen=True)
@@ -17,10 +18,12 @@ class IterationSignal:
     weakest_point: str
     score_improved: bool = False
     runtime_failure: bool = False
+    catastrophic_failure: bool = False
     novel_attack_ids: tuple[str, ...] = field(default_factory=tuple)
     novel_hinge_ids: tuple[str, ...] = field(default_factory=tuple)
     novel_primitive_ids: tuple[str, ...] = field(default_factory=tuple)
     verified_axioms_added: int = 0
+    falsification_mode: str = ""
     # R4: runner-contract signals consumed by yield evaluation
     mutation_r1_mismatch: bool = False          # True when R1 declaration validation failed
     claim_delta_type: str = ""                  # "NARROWING" | "WIDENING" | "REFRAMING" | ""
@@ -28,6 +31,10 @@ class IterationSignal:
     prior_committee_digest: str = ""            # digest of the previous iteration's committee
 
     def has_novelty(self) -> bool:
+        # GP-004: catastrophic failures should not reset stagnation just because
+        # they emitted new residue; they are still dead-end iterations.
+        if self.catastrophic_failure:
+            return False
         return bool(
             self.novel_attack_ids
             or self.novel_hinge_ids
@@ -110,6 +117,31 @@ def evaluate_information_yield(
 
     flat_tail = _collect_flat_tail(history)
     stagnant_window = len(flat_tail)
+
+    latest_falsification_mode = (latest.falsification_mode or "numerical_proof").strip().lower()
+    if (
+        latest_falsification_mode == "bounded_discriminator"
+        and stagnant_window >= pivot_after
+        and len(flat_tail) >= pivot_after
+        and all(
+            item.catastrophic_failure
+            and not item.runtime_failure
+            and not item.is_r1_failure()
+            for item in flat_tail[-pivot_after:]
+        )
+    ):
+        return InformationYieldDecision(
+            action=LoopControlAction.UNDERIDENTIFIED,
+            stagnant_window=stagnant_window,
+            rationale=(
+                "Bounded-discriminator run has produced a catastrophic streak. Possible causes: "
+                "(1) evidence boundary is insufficient for any discriminative claim now or in future, "
+                "(2) thesis relies on latent variables with no measurement protocol (GP-006 gap), "
+                "(3) thesis makes valid forward predictions but current evidence cannot yet resolve them "
+                "— in which case this is a legitimate research outcome, not a runner failure. "
+                "Operator must distinguish between these before deciding next action."
+            ),
+        )
 
     if stagnant_window >= 2 and all(
         (item.runtime_failure or item.is_r1_failure()) for item in flat_tail[-2:]

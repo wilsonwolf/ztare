@@ -24,6 +24,7 @@ from src.ztare.validator.semantic_gate_stabilization import (
     derive_self_reference_gate,
     persist_semantic_gate_analysis,
 )
+from src.ztare.validator.supervisor_usage import estimate_cost_usd, load_model_pricing
 from src.ztare.validator.v4_family import is_v4_family_project
 
 # 1. Setup & Args
@@ -94,6 +95,15 @@ openai_client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY")) if os.environ.g
 
 # Keep legacy `client` pointing to Gemini for ATTACKER_CONFIG function calling
 client = gemini_client
+JUDGE_USAGE = {
+    "model_name": None,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "estimated_cost_usd": 0.0,
+    "cost_known": False,
+}
 
 
 def _load_v4_stage_index() -> int | None:
@@ -132,6 +142,8 @@ def _call_anthropic_judge(prompt, model_id):
     )
     class _Resp:
         text = message.content[0].text
+        usage = getattr(message, "usage", None)
+        model = getattr(message, "model", model_id)
         candidates = None
         prompt_feedback = None
     return _Resp()
@@ -146,9 +158,46 @@ def _call_openai_judge(prompt, model_id):
     )
     class _Resp:
         text = response.choices[0].message.content
+        usage = getattr(response, "usage", None)
+        model = getattr(response, "model", model_id)
         candidates = None
         prompt_feedback = None
     return _Resp()
+
+
+def _accumulate_judge_usage(
+    *,
+    model_name,
+    input_tokens,
+    output_tokens,
+    cache_creation_input_tokens=0,
+    cache_read_input_tokens=0,
+    direct_cost_usd=None,
+):
+    JUDGE_USAGE["model_name"] = model_name or JUDGE_USAGE["model_name"] or JUDGE_MODEL_ID
+    input_tokens = int(input_tokens or 0)
+    output_tokens = int(output_tokens or 0)
+    cache_creation_input_tokens = int(cache_creation_input_tokens or 0)
+    cache_read_input_tokens = int(cache_read_input_tokens or 0)
+    JUDGE_USAGE["input_tokens"] += input_tokens
+    JUDGE_USAGE["output_tokens"] += output_tokens
+    JUDGE_USAGE["cache_creation_input_tokens"] += cache_creation_input_tokens
+    JUDGE_USAGE["cache_read_input_tokens"] += cache_read_input_tokens
+    pricing = load_model_pricing()
+    estimated_cost = (
+        float(direct_cost_usd)
+        if direct_cost_usd is not None
+        else estimate_cost_usd(
+            model_name=model_name,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            cache_creation_input_tokens=cache_creation_input_tokens,
+            cache_read_input_tokens=cache_read_input_tokens,
+        )
+    )
+    JUDGE_USAGE["estimated_cost_usd"] += estimated_cost
+    if direct_cost_usd is not None or model_name in pricing:
+        JUDGE_USAGE["cost_known"] = True
 
 
 def safe_generate(prompt, config=None, model_id=None):
@@ -178,6 +227,53 @@ def safe_generate(prompt, config=None, model_id=None):
             response = future.result(timeout=300)
             elapsed = time.time() - start_time
             print(f"✅ [DEBUG] Response received in {elapsed:.1f}s")
+            if is_claude:
+                usage = getattr(response, "usage", None)
+                _accumulate_judge_usage(
+                    model_name=getattr(response, "model", None) or model_id,
+                    input_tokens=getattr(usage, "input_tokens", 0) if usage is not None else 0,
+                    output_tokens=getattr(usage, "output_tokens", 0) if usage is not None else 0,
+                    cache_creation_input_tokens=getattr(usage, "cache_creation_input_tokens", 0)
+                    if usage is not None
+                    else 0,
+                    cache_read_input_tokens=getattr(usage, "cache_read_input_tokens", 0)
+                    if usage is not None
+                    else 0,
+                )
+            elif is_openai:
+                usage = getattr(response, "usage", None)
+                input_tokens = 0
+                output_tokens = 0
+                cache_read_input_tokens = 0
+                if usage is not None:
+                    input_tokens = int(
+                        getattr(usage, "prompt_tokens", getattr(usage, "input_tokens", 0)) or 0
+                    )
+                    output_tokens = int(
+                        getattr(usage, "completion_tokens", getattr(usage, "output_tokens", 0)) or 0
+                    )
+                    prompt_details = getattr(usage, "prompt_tokens_details", None)
+                    input_details = getattr(usage, "input_tokens_details", None)
+                    cache_read_input_tokens = int(
+                        getattr(prompt_details, "cached_tokens", 0)
+                        or getattr(input_details, "cached_tokens", 0)
+                        or 0
+                    )
+                _accumulate_judge_usage(
+                    model_name=getattr(response, "model", None) or model_id,
+                    input_tokens=input_tokens,
+                    output_tokens=output_tokens,
+                    cache_read_input_tokens=cache_read_input_tokens,
+                )
+            else:
+                usage_metadata = getattr(response, "usage_metadata", None)
+                if usage_metadata is not None:
+                    _accumulate_judge_usage(
+                        model_name=model_id,
+                        input_tokens=getattr(usage_metadata, "prompt_token_count", 0),
+                        output_tokens=getattr(usage_metadata, "candidates_token_count", 0),
+                        cache_read_input_tokens=getattr(usage_metadata, "cached_content_token_count", 0),
+                    )
             return response
 
         except concurrent.futures.TimeoutError:
@@ -1167,6 +1263,7 @@ if __name__ == "__main__":
         print(f"📝 FULL LOG SAVED TO: {log_path}")
         print("█" * 60 + "\n")
 
+    evaluation["usage_telemetry"] = dict(JUDGE_USAGE)
     with open(args.eval_results_path, "w") as f:
         json.dump(evaluation, f, indent=2)
 

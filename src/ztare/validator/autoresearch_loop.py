@@ -3,6 +3,7 @@ import json
 import subprocess
 import time
 import shutil
+import ast
 from pathlib import Path
 import argparse
 import sys
@@ -29,8 +30,25 @@ from src.ztare.validator.information_yield import (
     LoopControlAction,
     evaluate_information_yield,
 )
+from src.ztare.validator.supervisor_usage import estimate_cost_usd, load_model_pricing
 
 SESSION_TOKENS = 0
+SESSION_MUTATOR_USAGE = {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "estimated_cost_usd": 0.0,
+    "cost_known": False,
+}
+SESSION_JUDGE_USAGE = {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "estimated_cost_usd": 0.0,
+    "cost_known": False,
+}
 
 # 1. Setup CLI Arguments
 parser = argparse.ArgumentParser()
@@ -213,6 +231,14 @@ def _load_current_committee_digest(project: str) -> str:
     return digest if isinstance(digest, str) else ""
 
 
+def _is_catastrophic_failure(candidate_score: int, best_score_before: int) -> bool:
+    if candidate_score <= 0:
+        return True
+    if best_score_before > 0 and candidate_score < (best_score_before * 0.5):
+        return True
+    return False
+
+
 def _write_latest_information_yield(
     workspace_dir: Path,
     *,
@@ -229,10 +255,12 @@ def _write_latest_information_yield(
                     "weakest_point": signal.weakest_point,
                     "score_improved": signal.score_improved,
                     "runtime_failure": signal.runtime_failure,
+                    "catastrophic_failure": signal.catastrophic_failure,
                     "novel_attack_ids": list(signal.novel_attack_ids),
                     "novel_hinge_ids": list(signal.novel_hinge_ids),
                     "novel_primitive_ids": list(signal.novel_primitive_ids),
                     "verified_axioms_added": signal.verified_axioms_added,
+                    "falsification_mode": signal.falsification_mode,
                     "mutation_r1_mismatch": signal.mutation_r1_mismatch,
                     "claim_delta_type": signal.claim_delta_type,
                     "committee_digest": signal.committee_digest,
@@ -249,6 +277,41 @@ def _write_latest_information_yield(
     )
 
 
+def _latest_low_yield_tail(history: list[IterationSignal]) -> list[IterationSignal]:
+    tail: list[IterationSignal] = []
+    for item in reversed(history):
+        if item.score_improved or item.has_novelty():
+            break
+        tail.append(item)
+    tail.reverse()
+    return tail
+
+
+def _write_underidentification_verdict(
+    workspace_dir: Path,
+    *,
+    history: list[IterationSignal],
+    falsification_mode: str,
+) -> None:
+    tail = _latest_low_yield_tail(history)
+    payload = {
+        "verdict": "UNDERIDENTIFIED",
+        "falsification_mode": falsification_mode,
+        "catastrophic_streak": sum(1 for item in tail if item.catastrophic_failure),
+        "weakest_point_sequence": [item.weakest_point for item in tail],
+        "operator_options": [
+            "evidence_hardening: collect more evidence before further mutation",
+            "claim_narrowing: reduce thesis ambition to match current evidence boundary",
+            "freeze: declare project as successful exposing testbed",
+        ],
+        "timestamp": datetime.now().isoformat(),
+    }
+    write_file(
+        str(workspace_dir / "underidentification_verdict.json"),
+        json.dumps(payload, indent=2),
+    )
+
+
 def _extract_mutation_declaration(raw_text: str):
     match = re.search(r"```json\s*(\{.*?\})\s*```", raw_text, re.DOTALL)
     if not match:
@@ -259,11 +322,49 @@ def _extract_mutation_declaration(raw_text: str):
     return declaration, remaining
 
 
+def _validate_bounded_discriminator_suite(python_code: str) -> None:
+    """GP-007: bounded-discriminator suites must be portable in the runner env."""
+    try:
+        tree = ast.parse(python_code)
+    except SyntaxError as exc:
+        raise ValueError(f"Bounded-discriminator suite has invalid Python syntax: {exc}") from exc
+
+    stdlib_modules = getattr(sys, "stdlib_module_names", frozenset())
+    disallowed: list[str] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            names = [alias.name.split(".")[0] for alias in node.names]
+        elif isinstance(node, ast.ImportFrom):
+            if node.level and node.level > 0:
+                raise ValueError(
+                    "Bounded-discriminator suite cannot use relative imports; it must be standalone."
+                )
+            if node.module is None:
+                continue
+            names = [node.module.split(".")[0]]
+        else:
+            continue
+
+        for name in names:
+            if name == "__future__":
+                continue
+            if name not in stdlib_modules:
+                disallowed.append(name)
+
+    if disallowed:
+        unique = ", ".join(sorted(set(disallowed)))
+        raise ValueError(
+            "Bounded-discriminator suite imports non-standard dependencies "
+            f"({unique}). Use standard-library-only Python and plain `assert` statements."
+        )
+
+
 def _prepare_mutation_candidate(
     *,
     raw_text: str,
     current_thesis: str,
     current_test_model: str,
+    falsification_mode: str | None = None,
 ):
     declaration = None
     working_text = raw_text
@@ -279,6 +380,12 @@ def _prepare_mutation_candidate(
         if code_match
         else working_text.strip()
     )
+
+    if (
+        python_code is not None
+        and (falsification_mode or "numerical_proof").strip().lower() == "bounded_discriminator"
+    ):
+        _validate_bounded_discriminator_suite(python_code)
 
     validation_record = None
     if declaration is not None:
@@ -305,7 +412,7 @@ def _call_anthropic(prompt, model_id):
         max_tokens=16000,
         messages=[{"role": "user", "content": prompt}],
     )
-    return message.content[0].text
+    return message
 
 
 def _call_openai(prompt, model_id):
@@ -321,12 +428,61 @@ def _call_openai(prompt, model_id):
     else:
         kwargs["max_tokens"] = 16000
     response = openai_client.chat.completions.create(**kwargs)
-    return response.choices[0].message.content
+    return response
+
+
+def _accumulate_usage(
+    bucket,
+    *,
+    model_name,
+    input_tokens,
+    output_tokens,
+    cache_creation_input_tokens=0,
+    cache_read_input_tokens=0,
+    direct_cost_usd=None,
+):
+    global SESSION_TOKENS
+
+    input_tokens = int(input_tokens or 0)
+    output_tokens = int(output_tokens or 0)
+    cache_creation_input_tokens = int(cache_creation_input_tokens or 0)
+    cache_read_input_tokens = int(cache_read_input_tokens or 0)
+
+    bucket["input_tokens"] += input_tokens
+    bucket["output_tokens"] += output_tokens
+    bucket["cache_creation_input_tokens"] += cache_creation_input_tokens
+    bucket["cache_read_input_tokens"] += cache_read_input_tokens
+    SESSION_TOKENS += (
+        input_tokens
+        + output_tokens
+        + cache_creation_input_tokens
+        + cache_read_input_tokens
+    )
+
+    pricing = load_model_pricing()
+    estimated_cost = (
+        float(direct_cost_usd)
+        if direct_cost_usd is not None
+        else estimate_cost_usd(
+            model_name=model_name,
+            input_tokens=input_tokens,
+            output_tokens=output_tokens,
+            cache_creation_input_tokens=cache_creation_input_tokens,
+            cache_read_input_tokens=cache_read_input_tokens,
+        )
+    )
+    bucket["estimated_cost_usd"] += estimated_cost
+    if direct_cost_usd is not None or model_name in pricing:
+        bucket["cost_known"] = True
+
+
+def _format_cost_label(bucket) -> str:
+    if bucket["cost_known"]:
+        return f"${bucket['estimated_cost_usd']:.4f}"
+    return "unavailable (pricing disabled or unknown model)"
 
 
 def safe_mutate(prompt, config=None, model_id=MUTATOR_MODEL_ID):
-    global SESSION_TOKENS
-
     with open(f"{PROJECT_DIR}/last_prompt_debug.txt", "w") as f:
         f.write(f"MODEL USED: {model_id}\n")
         f.write("=" * 30 + "\n")
@@ -356,11 +512,59 @@ def safe_mutate(prompt, config=None, model_id=MUTATOR_MODEL_ID):
             elapsed = time.time() - start_time
             print(f"✅ [DEBUG] Response received in {elapsed:.1f}s")
 
-            if is_claude or is_openai:
-                return response  # already a string
+            if is_claude:
+                usage = getattr(response, "usage", None)
+                _accumulate_usage(
+                    SESSION_MUTATOR_USAGE,
+                    model_name=getattr(response, "model", None) or model_id,
+                    input_tokens=getattr(usage, "input_tokens", 0) if usage is not None else 0,
+                    output_tokens=getattr(usage, "output_tokens", 0) if usage is not None else 0,
+                    cache_creation_input_tokens=getattr(usage, "cache_creation_input_tokens", 0)
+                    if usage is not None
+                    else 0,
+                    cache_read_input_tokens=getattr(usage, "cache_read_input_tokens", 0)
+                    if usage is not None
+                    else 0,
+                )
+                return response.content[0].text
 
-            if response.usage_metadata:
-                SESSION_TOKENS += response.usage_metadata.total_token_count
+            if is_openai:
+                usage = getattr(response, "usage", None)
+                input_tokens = 0
+                output_tokens = 0
+                cache_read_input_tokens = 0
+                if usage is not None:
+                    input_tokens = int(
+                        getattr(usage, "prompt_tokens", getattr(usage, "input_tokens", 0)) or 0
+                    )
+                    output_tokens = int(
+                        getattr(usage, "completion_tokens", getattr(usage, "output_tokens", 0)) or 0
+                    )
+                    prompt_details = getattr(usage, "prompt_tokens_details", None)
+                    input_details = getattr(usage, "input_tokens_details", None)
+                    cache_read_input_tokens = int(
+                        getattr(prompt_details, "cached_tokens", 0)
+                        or getattr(input_details, "cached_tokens", 0)
+                        or 0
+                    )
+                _accumulate_usage(
+                    SESSION_MUTATOR_USAGE,
+                    model_name=getattr(response, "model", None) or model_id,
+                    input_tokens=input_tokens,
+                    output_tokens=output_tokens,
+                    cache_read_input_tokens=cache_read_input_tokens,
+                )
+                return response.choices[0].message.content
+
+            usage_metadata = getattr(response, "usage_metadata", None)
+            if usage_metadata:
+                _accumulate_usage(
+                    SESSION_MUTATOR_USAGE,
+                    model_name=model_id,
+                    input_tokens=getattr(usage_metadata, "prompt_token_count", 0),
+                    output_tokens=getattr(usage_metadata, "candidates_token_count", 0),
+                    cache_read_input_tokens=getattr(usage_metadata, "cached_content_token_count", 0),
+                )
             return response.text
 
         except concurrent.futures.TimeoutError:
@@ -402,6 +606,7 @@ def mutate_thesis(
     stagnation_count,
     model_id=MUTATOR_MODEL_ID,
     failure_log=None,
+    falsification_mode=None,
 ):
     task_header = "TASK: Resolve the following Systemic Inconsistency:"
     pivot_instruction = ""
@@ -534,33 +739,106 @@ def mutate_thesis(
         
         TASK: Execute a structural mutation. Concede the lost state, apply the new mechanism, and define the exact systemic trade-offs. 
         """
-    elif not is_v4_project:
-        style_guide = """
-    STRICT STYLE GUIDE & LAWS OF PHYSICS: 
-        - SYMBOLIC MAPPING: You must map the core problem to the equation $Z = f(X, Y)$. Explicitly define $X$ (the blocked variable) and $Y$ (the leverage variable). 
+    if not is_v4_project:
+        # GP-003: branch on falsification_mode from rubric.
+        # Absent or "numerical_proof" -> legacy behavior unchanged (Paper 1 safe).
+        # "bounded_discriminator" -> discriminator-mode prompt for causal/historical theses.
+        _fmode = (falsification_mode or "numerical_proof").strip().lower()
+        if _fmode == "bounded_discriminator":
+            style_guide = """
+    STYLE GUIDE — BOUNDED DISCRIMINATOR MODE:
+        - CAUSAL MECHANISM (MANDATORY): State the core claim as a conditional:
+          "If [condition P] then [outcome Q] under [scope conditions C]."
+          Do NOT map to a symbolic equation ($Z = f(X, Y)$) unless the evidence directly supports one.
+        - RIVAL HYPOTHESIS (MANDATORY): Name the strongest alternative explanation.
+          State explicitly why your thesis predicts a different observable than the rival does.
+        - NAMED DISCRIMINATOR (MANDATORY): Define the one observable condition or evidence pattern
+          that separates your thesis from the rival. The discriminator must be evaluable against
+          evidence that exists or could be collected, not against a number you invented.
+        - OBSERVABLE PROXY (MANDATORY): For each decisive variable in your discriminator,
+          you must do one of exactly three things:
+          (A) CURRENT OBSERVABLE: A measurable quantity or documented event evaluable against
+              the evidence in `evidence.txt` now. State what value range or pattern confirms
+              your thesis vs. the rival.
+          (B) FORWARD OBSERVABLE: A measurement protocol that will be evaluable in future but
+              is not yet resolved. Must specify all three:
+                1. WHAT will be measured (concrete variable or documented event, not a latent construct)
+                2. WHEN it will be evaluable (time horizon, e.g. "within 10 years", "at next recession")
+                3. DIRECTION: what outcome confirms the thesis vs. the rival
+              The Python suite must assert the logical structure of the forward prediction:
+              if the antecedent condition is met, the thesis predicts X and the rival predicts Y.
+              Do NOT assert a current resolution — assert the conditional structure.
+          (C) UNRESOLVED: The variable has no measurement protocol now or in future. Declare:
+              "UNRESOLVED: [variable name] — no measurement protocol available. Excluded from
+              scoring." This variable cannot appear as decisive anywhere in the thesis.
+          A discriminator that uses decisive variables without satisfying (A), (B), or (C) will be
+          failed by the Auditor regardless of logical coherence.
+          NOTE: A forward observable (B) is NOT the same as a latent variable. Latent variables
+          lack a measurement protocol entirely. Forward observables have a clear protocol and
+          timeline — the thesis is making a testable prediction about future evidence.
+        - LOAD-BEARING VARIABLES (MANDATORY): Where thresholds or comparisons appear, derive them
+          from cited evidence ranges. If no evidence supports a specific threshold, use a
+          comparative form (A > B under condition C) rather than an absolute scalar.
+        - NO METAPHORS: Strictly forbidden.
+        - ARITHMETIC TRANSPARENCY: All quantitative claims must be supported by evidence-grounded equations.
+        - GATEKEEPER REALITY: Identify the entity with the Absolute Veto. Define the leverage required to force a state-change.
+        """
+            output_requirements = """
+    CRITICAL OUTPUT REQUIREMENT (THE LOGIC DAG):
+        - You must output a "Logic DAG" in markdown at the bottom.
+        - [Axiom 1] -> [Discriminator condition] -> [Rival ruled out] -> [Conclusion]
+        - Any leap-of-faith node will be failed by the Auditor.
+
+    FORMATTING:
+        - MANDATORY: You must provide exactly one Python code block (```python) for `test_model.py`.
+        - DISCRIMINATOR TEST (MANDATORY): The Python block must assert the discriminator structure —
+          e.g., that rival predictions diverge from your thesis predictions under specified conditions,
+          or that your named observable holds in the cited evidence range.
+          Do NOT assert a single hardcoded scalar threshold unless it is explicitly evidence-derived.
+        - Each CURRENT OBSERVABLE proxy must have a corresponding assert in `test_model.py`
+          checking the value or pattern against current evidence.
+        - Each FORWARD OBSERVABLE must have a corresponding assert in `test_model.py` encoding
+          the LOGICAL STRUCTURE of the prediction: assert that if antecedent X holds, the thesis
+          predicts Y and the rival predicts Z (use conditional logic, not current data resolution).
+        - `UNRESOLVED:` declarations must appear as comments only, never as asserts.
+        - PORTABILITY REQUIREMENT (MANDATORY): `test_model.py` must be standalone and use
+          standard-library-only Python. Do NOT import `pytest`, `numpy`, `pandas`, `scipy`,
+          `requests`, `pint`, or any other third-party package. Use plain `assert` statements.
+        - UNRESOLVED BOUNDARY (MANDATORY): Include a clearly labeled section titled
+          "WHAT THIS THESIS DOES NOT CURRENTLY PROVE" listing at least one open causal question
+          your discriminator cannot resolve with current evidence. Forward observables (B) are
+          NOT entries in this section — they are predictions, not gaps. Only UNRESOLVED (C)
+          variables and genuinely open causal questions belong here.
+        - Maximize information-to-word ratio. Scannable, scientific, scrupulous.
+        """
+        else:
+            # Default: numerical_proof mode — legacy behavior, Paper 1 safe.
+            style_guide = """
+    STRICT STYLE GUIDE & LAWS OF PHYSICS:
+        - SYMBOLIC MAPPING: You must map the core problem to the equation $Z = f(X, Y)$. Explicitly define $X$ (the blocked variable) and $Y$ (the leverage variable).
         - ARITHMETIC TRANSPARENCY: All quantitative claims must be supported by a balanced equation.
         - LOAD-BEARING VARIABLES (MANDATORY): Before your Python block, you MUST provide a markdown table titled "LOAD-BEARING VARIABLES". List every physical constant, financial metric, or baseline assumption you use, and state its exact real-world value. The Attackers will Google these values to verify them. NO HALLUCINATED ENTITY CONSTANTS.
         - STRUCTURAL ARBITRAGE: You are REQUIRED to introduce systemic bypasses, reciprocal leverage points, or category shifts to resolve the Auditor's critique.
         - CONSERVATION OF TRADE-OFFS: A system cannot increase Velocity ($V$) without a proportional increase in Energy ($E$) or decrease in Mass ($M$). You must explicitly state the new operational drag introduced by the pivot.
         - GATEKEEPER REALITY: Identify the entity with the Absolute Veto (The Bottleneck). Define the Asymmetric Leverage required to force a state-change.
 
-        - NO METAPHORS: You are strictly FORBIDDEN from using metaphorical framing (e.g., "The universe is a compiler" or "The company is a ship"). 
-        - FALSIFIABILITY: You MUST output a specific, numerical, and testable prediction. 
+        - NO METAPHORS: You are strictly FORBIDDEN from using metaphorical framing (e.g., "The universe is a compiler" or "The company is a ship").
+        - FALSIFIABILITY: You MUST output a specific, numerical, and testable prediction.
           * For Science: Predict a specific laboratory result or numerical variance in a physical constant.
           * For Business: Predict a specific financial metric (e.g., EBITDA margin, $t$-month payback, or churn rate) under a defined shock.
-        - UNIT TEST REQUIREMENT: Your `test_model.py` must contain 'assert' statements that would FAIL if this prediction is not met.   
+        - UNIT TEST REQUIREMENT: Your `test_model.py` must contain 'assert' statements that would FAIL if this prediction is not met.
         TERMINAL MATH PROTOCOL:
-        - If your previous Python execution returned `NaN`, `inf`, or a `DimensionalityError`, your core equation ($Z = f(X, Y)$) is mathematically insolvent. You are FORBIDDEN from attempting to patch it using Python `try/except` blocks or `float64` limits. You must discard the mathematical relationship entirely, identify a different limiting constraint (e.g., thermal limits instead of spatial limits, or liquidity constraints instead of TAM), and derive a fundamentally new equation.    
+        - If your previous Python execution returned `NaN`, `inf`, or a `DimensionalityError`, your core equation ($Z = f(X, Y)$) is mathematically insolvent. You are FORBIDDEN from attempting to patch it using Python `try/except` blocks or `float64` limits. You must discard the mathematical relationship entirely, identify a different limiting constraint (e.g., thermal limits instead of spatial limits, or liquidity constraints instead of TAM), and derive a fundamentally new equation.
         """
-        output_requirements = """
+            output_requirements = """
     CRITICAL OUTPUT REQUIREMENT (THE LOGIC DAG):
-        - You must output a "Logic DAG" (Directed Acyclic Graph) at the bottom of your response in markdown format. 
+        - You must output a "Logic DAG" (Directed Acyclic Graph) at the bottom of your response in markdown format.
         - List your Axioms (Premises) and show exactly how they link to your Conclusion.
         - Format example:
         - [Axiom 1: Existing constraint] -> [Axiom 2: New leverage point] -> [Conclusion: Resultant state Z]
-        - If any node in your graph requires a leap of faith, the Auditor will fail you.        
-        
-    
+        - If any node in your graph requires a leap of faith, the Auditor will fail you.
+
+
     FORMATTING:
         - MANDATORY: You must provide exactly one Python code block (wrapped in ```python) that constitutes the test_model.py script. This script must be standalone and execute all necessary assertions.
         - QUANTITATIVE GUARDRAIL (MANDATORY): Your `test_model.py` MUST strictly enforce mathematical reality based on the domain:
@@ -769,6 +1047,19 @@ if __name__ == "__main__":
 
     evidence_text = read_file(EVIDENCE_PATH)
     shutil.copy(THESIS_PATH, WORKING_PATH)
+    baseline_test_model_path = f"{PROJECT_DIR}/test_model.py"
+    if not os.path.exists(baseline_test_model_path):
+        write_file(
+            baseline_test_model_path,
+            "assert False, 'Baseline thesis is missing a falsification suite (test_model.py).'",
+        )
+        print(
+            "⚠️ Baseline thesis has no falsification suite. Forcing a test failure to ensure rigor."
+        )
+    elif os.path.getmtime(THESIS_PATH) > os.path.getmtime(baseline_test_model_path):
+        print(
+            "⚠️ Baseline thesis is newer than test_model.py; initial evaluation may use a stale falsification suite."
+        )
 
     test_cmd = [
         sys.executable,
@@ -811,9 +1102,26 @@ if args.dynamic:
 subprocess.run(test_cmd, check=True)
 with open("eval_results.json", "r") as f:
     res = json.load(f)
+judge_usage = res.get("usage_telemetry")
+if isinstance(judge_usage, dict):
+    _accumulate_usage(
+        SESSION_JUDGE_USAGE,
+        model_name=judge_usage.get("model_name"),
+        input_tokens=judge_usage.get("input_tokens", 0),
+        output_tokens=judge_usage.get("output_tokens", 0),
+        cache_creation_input_tokens=judge_usage.get("cache_creation_input_tokens", 0),
+        cache_read_input_tokens=judge_usage.get("cache_read_input_tokens", 0),
+        direct_cost_usd=judge_usage.get("estimated_cost_usd") if judge_usage.get("cost_known") else None,
+    )
 
 best_score = res["score"]
 best_weakest_point = res["weakest_point"]
+# GP-002: separate best-state memory from mutator-facing control signal.
+# best_weakest_point tracks the critique attached to the retained best state.
+# current_target_weakest_point is what we feed to mutate_thesis() every iteration.
+current_target_weakest_point = best_weakest_point or ""
+# GP-003: read falsification_mode from rubric; absent or "numerical_proof" -> legacy behavior.
+rubric_falsification_mode = rubric_data.get("falsification_mode", "numerical_proof")
 stagnation_count = 0
 last_failure_reason = None
 best_state = _capture_project_state(_project_state_paths(PROJECT_DIR))
@@ -859,20 +1167,33 @@ for i in range(ITERATIONS):
     current_test_model = read_file(f"{PROJECT_DIR}/test_model.py") if os.path.exists(f"{PROJECT_DIR}/test_model.py") else ""
     workspace_dir = Path(PROJECT_DIR) / "workspace"
     workspace_dir.mkdir(parents=True, exist_ok=True)
+    if pending_loop_action == LoopControlAction.UNDERIDENTIFIED:
+        print("🛑 R4 ACTION UNDERIDENTIFIED: bounded-discriminator search exhausted.")
+        _write_underidentification_verdict(
+            workspace_dir,
+            history=iteration_history,
+            falsification_mode=rubric_falsification_mode,
+        )
+        print(
+            "   Options: evidence_hardening | claim_narrowing | freeze"
+        )
+        break
     try:
         new_content = mutate_thesis(
             current_thesis,
-            best_weakest_point,
+            current_target_weakest_point,  # GP-002: use current evaluated target, not best-state memory
             evidence_text,
             rubric_data["persona"],
             stagnation_count,
             model_id=current_mutator,
             failure_log=last_failure_reason,
+            falsification_mode=rubric_falsification_mode,  # GP-003: pass rubric mode
         )
         mutation_declaration, mutation_validation, clean_thesis, python_code, full_candidate = _prepare_mutation_candidate(
             raw_text=new_content,
             current_thesis=current_thesis,
             current_test_model=current_test_model,
+            falsification_mode=rubric_falsification_mode,
         )
     except Exception as exc:
         print(f"⚠️ Runner R1 rejection: {exc}")
@@ -881,6 +1202,7 @@ for i in range(ITERATIONS):
             score=best_score,
             weakest_point=f"Runner R1 rejection: {exc}",
             mutation_r1_mismatch=True,
+            falsification_mode=rubric_falsification_mode,
             committee_digest=current_committee_digest,
             prior_committee_digest=iteration_prior_committee_digest,
         )
@@ -941,6 +1263,7 @@ for i in range(ITERATIONS):
                 f"{mutation_validation.rationale}"
             ),
             mutation_r1_mismatch=True,
+            falsification_mode=rubric_falsification_mode,
             claim_delta_type=mutation_declaration.claim_delta_type.value if mutation_declaration is not None else "",
             committee_digest=current_committee_digest,
             prior_committee_digest=iteration_prior_committee_digest,
@@ -986,6 +1309,17 @@ for i in range(ITERATIONS):
         subprocess.run(test_cmd, check=True)
         with open("eval_results.json", "r") as f:
             new_eval = json.load(f)
+        judge_usage = new_eval.get("usage_telemetry")
+        if isinstance(judge_usage, dict):
+            _accumulate_usage(
+                SESSION_JUDGE_USAGE,
+                model_name=judge_usage.get("model_name"),
+                input_tokens=judge_usage.get("input_tokens", 0),
+                output_tokens=judge_usage.get("output_tokens", 0),
+                cache_creation_input_tokens=judge_usage.get("cache_creation_input_tokens", 0),
+                cache_read_input_tokens=judge_usage.get("cache_read_input_tokens", 0),
+                direct_cost_usd=judge_usage.get("estimated_cost_usd") if judge_usage.get("cost_known") else None,
+            )
 
         selection_record = evaluate_candidate_selection(
             candidate_score=new_eval["score"],
@@ -1021,6 +1355,7 @@ for i in range(ITERATIONS):
                 iteration_index=i + 1,
                 score=new_eval["score"],
                 weakest_point=f"Runner R3 rejection: {selection_record.rationale}",
+                falsification_mode=rubric_falsification_mode,
                 claim_delta_type=mutation_declaration.claim_delta_type.value if mutation_declaration is not None else "",
                 committee_digest=current_committee_digest,
                 prior_committee_digest=iteration_prior_committee_digest,
@@ -1040,6 +1375,8 @@ for i in range(ITERATIONS):
             score=new_eval["score"],
             weakest_point=new_eval["weakest_point"],
             score_improved=new_eval["score"] > best_score,
+            catastrophic_failure=_is_catastrophic_failure(new_eval["score"], best_score),
+            falsification_mode=rubric_falsification_mode,
             claim_delta_type=mutation_declaration.claim_delta_type.value if mutation_declaration is not None else "",
             committee_digest=current_committee_digest,
             prior_committee_digest=iteration_prior_committee_digest,
@@ -1053,7 +1390,8 @@ for i in range(ITERATIONS):
             print(f"✅ IMPROVEMENT: {best_score} -> {new_eval['score']}")
             print(f"Targeting New Weakest Link: {new_eval['weakest_point']}")
             best_score = new_eval["score"]
-            best_weakest_point = new_eval["weakest_point"]
+            best_weakest_point = new_eval["weakest_point"]  # GP-002: best-state memory
+            current_target_weakest_point = new_eval["weakest_point"]  # GP-002: control signal
             stagnation_count = yield_decision.stagnant_window
             last_failure_reason = None
             pending_loop_action = yield_decision.action
@@ -1167,6 +1505,7 @@ for i in range(ITERATIONS):
             print(f"Failed to Resolve: {new_eval['weakest_point']}")
             stagnation_count = yield_decision.stagnant_window
             last_failure_reason = new_eval["weakest_point"]
+            current_target_weakest_point = new_eval["weakest_point"]  # GP-002: update targeting even on non-improving iterations
             pending_loop_action = yield_decision.action
             _restore_project_state(best_state)
             if os.path.exists(f"{AXIOM_PATH}.bak"):
@@ -1179,6 +1518,8 @@ for i in range(ITERATIONS):
             score=best_score,
             weakest_point="Auditor subprocess crashed",
             runtime_failure=True,
+            catastrophic_failure=True,
+            falsification_mode=rubric_falsification_mode,
             claim_delta_type=mutation_declaration.claim_delta_type.value if mutation_declaration is not None else "",
             committee_digest=current_committee_digest,
             prior_committee_digest=iteration_prior_committee_digest,
@@ -1197,8 +1538,18 @@ for i in range(ITERATIONS):
     print("\n" + "=" * 50)
     print("🏁 OPTIMIZATION LOOP COMPLETE")
     print(f"Final Score: {best_score}")
-    print(f"Total Mutator Tokens Used: {SESSION_TOKENS:,}")
-    # Using a rough average of $1.50 per 1M tokens for Gemini Pro/Flash mix
-    est_cost = (SESSION_TOKENS / 1000000) * 1.50
-    print(f"Estimated Mutator Cost: ${est_cost:.4f}")
+    print(
+        "Mutator Usage: "
+        f"input={SESSION_MUTATOR_USAGE['input_tokens']:,} "
+        f"output={SESSION_MUTATOR_USAGE['output_tokens']:,} "
+        f"cache_read={SESSION_MUTATOR_USAGE['cache_read_input_tokens']:,}"
+    )
+    print(f"Estimated Mutator Cost: {_format_cost_label(SESSION_MUTATOR_USAGE)}")
+    print(
+        "Judge Usage: "
+        f"input={SESSION_JUDGE_USAGE['input_tokens']:,} "
+        f"output={SESSION_JUDGE_USAGE['output_tokens']:,} "
+        f"cache_read={SESSION_JUDGE_USAGE['cache_read_input_tokens']:,}"
+    )
+    print(f"Estimated Judge Cost: {_format_cost_label(SESSION_JUDGE_USAGE)}")
     print("=" * 50 + "\n")
